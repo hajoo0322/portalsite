@@ -1,8 +1,8 @@
-package com.portalSite.cafe.repository;
+package com.portalSite.cafe.service;
 
 import com.portalSite.cafe.dto.CafeResponse;
 import com.portalSite.cafe.dto.RequestCafe;
-import com.portalSite.cafe.service.CafeRepository;
+import com.portalSite.cafe.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

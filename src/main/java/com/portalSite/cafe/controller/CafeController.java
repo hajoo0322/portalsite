@@ -2,7 +2,7 @@ package com.portalSite.cafe.controller;
 
 import com.portalSite.cafe.dto.CafeResponse;
 import com.portalSite.cafe.dto.RequestCafe;
-import com.portalSite.cafe.repository.CafeService;
+import com.portalSite.cafe.service.CafeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
