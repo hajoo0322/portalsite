@@ -1,5 +1,6 @@
 package com.portalSite.comment.entity;
 
+import com.portalSite.cafe.entity.Cafe;
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
 import com.portalSite.news.entity.News;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table
+@Table(name = "comment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 
@@ -37,4 +38,16 @@ public class Comment extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    private Comment(Member member, Blog blog, News news, Cafe cafe, String content) {
+        this.member = member;
+        this.blog = blog;
+        this.news = news;
+        this.cafe = cafe;
+        this.content = content;
+    }
+
+    public static Comment of(Member member, Blog blog, News news, Cafe cafe, String content) {
+        return new Comment(member, blog, news, cafe, content);
+    }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table
+@Table(name = "like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like {
     @Id
@@ -29,4 +29,14 @@ public class Like {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private Like(CafePost cafePost, CafeMember cafeMember, LocalDateTime createdAt) {
+        this.cafePost = cafePost;
+        this.cafeMember = cafeMember;
+        this.createdAt = createdAt;
+    }
+
+    public static Like of(CafePost cafePost, CafeMember cafeMember) {
+        return new Like(cafePost, cafeMember, LocalDateTime.now());
+    }
 }

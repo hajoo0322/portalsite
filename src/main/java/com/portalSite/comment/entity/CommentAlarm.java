@@ -1,5 +1,6 @@
 package com.portalSite.comment.entity;
 
+import com.portalSite.cafe.entity.Cafe;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table
+@Table(name = "comment_alarm")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentAlarm {
 
@@ -30,4 +31,14 @@ public class CommentAlarm {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private CommentAlarm(CafeMember cafeMember, CafePost cafePost, LocalDateTime createdAt) {
+        this.cafeMember = cafeMember;
+        this.cafePost = cafePost;
+        this.createdAt = createdAt;
+    }
+
+    public static CommentAlarm of(CafeMember cafeMember, CafePost cafePost) {
+        return new CommentAlarm(cafeMember, cafePost, LocalDateTime.now());
+    }
 }

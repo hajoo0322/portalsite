@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table
+@Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
@@ -40,4 +40,30 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isDeleted = false;
+
+    private Member(String email, String loginId, String password, String name, String phoneNumber, String nickname, MemberRole memberRole) {
+        this.email = email;
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
+        this.memberRole = memberRole;
+    }
+
+    public static Member of(String email, String loginId, String password, String name, String phoneNumber, String nickname) {
+        return new Member(email, loginId, password, name, phoneNumber, nickname, MemberRole.USER);
+    }
+
+    public void changeMemberRole(MemberRole memberRole) {
+        this.memberRole = memberRole;
+    }
+
+    public void softDelete () {
+        this.isDeleted = true;
+    }
+
+    public void restore() {
+        this.isDeleted = false;
+    }
 }
