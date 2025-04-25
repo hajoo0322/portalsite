@@ -28,14 +28,24 @@ public class CafeLevel {
     @Column(name = "auto_level")
     private Boolean autoLevel;
 
-    private CafeLevel(Cafe cafe, String grade, String description, Boolean autoLevel) {
+    @Column(name = "grade_order")
+    private Integer gradeOrder;
+
+    private CafeLevel(Cafe cafe, String grade, String description, Boolean autoLevel, Integer gradeOrder) {
         this.cafe = cafe;
         this.grade = grade;
         this.description = description;
         this.autoLevel = autoLevel;
+        this.gradeOrder = gradeOrder;
     }
 
-    public static CafeLevel of(Cafe cafe, String grade, String description, Boolean autoLevel) {
-        return new CafeLevel(cafe, grade, description, autoLevel);
+    public static CafeLevel of(Cafe cafe, String grade, String description, Boolean autoLevel, Integer gradeOrder) {
+        return new CafeLevel(cafe, grade, description, autoLevel, gradeOrder);
+    }
+
+    public void update(String grade, String description, Boolean autoLevel) {
+        this.grade = grade;
+        this.description = description;
+        this.autoLevel = autoLevel;
     }
 }

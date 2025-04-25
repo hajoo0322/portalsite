@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,14 +24,11 @@ public class CafeLevelService {
     @Transactional
     public List<CafeLevelResponse> addCafeLevel(CafeLevelRequestList cafeLevelRequest, Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
-        List<CafeLevel> cafeLevelResponses = new ArrayList<>();
-        for (CafeLevelRequest cafeLevelList : cafeLevelRequest.cafeLevelRequestList()) {
-            CafeLevel cafeLevel = CafeLevel.of(cafe, cafeLevelList.grade(), cafeLevelList.description(), cafeLevelList.autoLevel());
-            CafeLevel savedCafeLevel = cafeLevelRepository.save(cafeLevel);
-            cafeLevelResponses.add(savedCafeLevel);
-        }
-        // 리스트 순서대로 저장된다는 보장이 안됨 수정필요
-        return cafeLevelResponses.stream().map(CafeLevelResponse::of).toList();
+        List<CafeLevel> cafeLevelList = cafeLevelRequest.cafeLevelRequestList().stream()
+                .map(req -> CafeLevel.of(cafe, req.grade(), req.description(), req.autoLevel(), req.gradeOrder())).toList();
+        List<CafeLevel> savedCafeLevelList = cafeLevelRepository.saveAll(cafeLevelList);
+
+        return savedCafeLevelList.stream().map(CafeLevelResponse::of).toList();
     }
 
     @Transactional(readOnly = true)
@@ -44,8 +41,37 @@ public class CafeLevelService {
     }
 
     @Transactional
-    public List<CafeLevelResponse> updateCafeLevel(CafeLevelRequestList cafeLevelRequest) {
+    public List<CafeLevelResponse> updateCafeLevel(CafeLevelRequestList cafeLevelRequest, Long cafeId) {
+        List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeId(cafeId);
+        Cafe cafe = cafeLevelList.get(0).getCafe();
+        Map<Integer, CafeLevel> cafeLevelMap = cafeLevelList.stream()
+                .collect(Collectors.toMap(CafeLevel::getGradeOrder, Function.identity()));
 
-        return null;
+        List<CafeLevel> levelsToSave = new ArrayList<>();
+        Set<Integer> gradeOrdersRequest = new HashSet<>();
+
+        for (CafeLevelRequest levelRequest : cafeLevelRequest.cafeLevelRequestList()) {
+            Integer gradeOrder = levelRequest.gradeOrder();
+            gradeOrdersRequest.add(gradeOrder);
+
+            CafeLevel target = cafeLevelMap.get(levelRequest.gradeOrder());
+            if (target != null) {
+                target.update(levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel());
+                levelsToSave.add(target);
+            } else {
+                CafeLevel cafeLevel = CafeLevel
+                        .of(cafe, levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel(), levelRequest.gradeOrder());
+                levelsToSave.add(cafeLevel);
+            }
+        }
+
+        List<CafeLevel> deleteList = cafeLevelMap.entrySet().stream()
+                .filter(entry -> !gradeOrdersRequest.contains(entry.getKey()))
+                .map(Map.Entry::getValue).toList();
+
+        List<CafeLevel> savedCafeLevelList = cafeLevelRepository.saveAll(levelsToSave);
+        cafeLevelRepository.deleteAll(deleteList);
+        return savedCafeLevelList.stream().map(CafeLevelResponse::of).toList();
     }
+
 }

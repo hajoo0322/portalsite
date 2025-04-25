@@ -3,16 +3,21 @@ package com.portalSite.cafe.service;
 import com.portalSite.cafe.dto.CafeResponse;
 import com.portalSite.cafe.dto.CafeRequest;
 import com.portalSite.cafe.entity.Cafe;
+import com.portalSite.cafe.entity.CafeLevel;
+import com.portalSite.cafe.repository.CafeLevelRepository;
 import com.portalSite.cafe.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CafeService{
 
     private final CafeRepository cafeRepository;
+    private final CafeLevelRepository cafeLevelRepository;
 
     @Transactional
     public CafeResponse addCafe(CafeRequest requestCafe) {
@@ -38,6 +43,8 @@ public class CafeService{
     @Transactional
     public void deleteCafe(Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeId(cafeId);
         cafeRepository.delete(cafe);
+        cafeLevelRepository.deleteAll(cafeLevelList);
     }
 }

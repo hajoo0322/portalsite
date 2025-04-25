@@ -32,8 +32,8 @@ public class CafeLevelController {
     }
 
     @PatchMapping
-    public ResponseEntity<List<CafeLevelResponse>> updateCafeLevel(@RequestBody @Valid CafeLevelRequestList cafeLevelRequestList) {
-        List<CafeLevelResponse> cafeLevel = cafeLevelService.updateCafeLevel(cafeLevelRequestList);
+    public ResponseEntity<List<CafeLevelResponse>> updateCafeLevel(@RequestBody @Valid CafeLevelRequestList cafeLevelRequestList,@PathVariable Long cafeId) {
+        List<CafeLevelResponse> cafeLevel = cafeLevelService.updateCafeLevel(cafeLevelRequestList,cafeId);
         return ResponseEntity.status(HttpStatus.OK).body(cafeLevel);
     }
 }
