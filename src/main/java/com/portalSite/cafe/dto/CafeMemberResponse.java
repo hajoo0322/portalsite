@@ -1,4 +1,16 @@
 package com.portalSite.cafe.dto;
 
-public record CafeMemberResponse() {
+import com.portalSite.cafe.entity.CafeMember;
+
+public record CafeMemberResponse(
+        Long id,
+        Long cafeId,
+        String cafeGrade,
+        int visitCount,
+        String nickname
+
+) {
+    public static CafeMemberResponse of(CafeMember cafeMember) {
+        return new CafeMemberResponse(cafeMember.getId(),cafeMember.getCafe().getId(),cafeMember.getCafeGrade(),cafeMember.getVisitCount(),cafeMember.getNickname());
+    }
 }
