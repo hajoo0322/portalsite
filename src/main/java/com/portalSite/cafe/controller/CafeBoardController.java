@@ -3,6 +3,7 @@ package com.portalSite.cafe.controller;
 import com.portalSite.cafe.dto.CafeBoardRequest;
 import com.portalSite.cafe.dto.CafeBoardResponse;
 import com.portalSite.cafe.service.CafeBoardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class CafeBoardController {
     private final CafeBoardService cafeBoardService;
 
     @PostMapping
-    public ResponseEntity<CafeBoardResponse> addCafeBoard(@RequestBody CafeBoardRequest cafeBoardRequest, @PathVariable Long cafeId) {
+    public ResponseEntity<CafeBoardResponse> addCafeBoard(@RequestBody @Valid CafeBoardRequest cafeBoardRequest, @PathVariable Long cafeId) {
         CafeBoardResponse cafeBoardResponse = cafeBoardService.addCafeBoard(cafeBoardRequest, cafeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(cafeBoardResponse);
     }
@@ -30,8 +31,8 @@ public class CafeBoardController {
     }
 
     @PatchMapping("/{cafeBoardId}")
-    public ResponseEntity<CafeBoardResponse> updateCafeBoard(@RequestBody CafeBoardRequest cafeBoardRequest, @PathVariable Long cafeId, @PathVariable Long cafeBoardId) {
-        CafeBoardResponse cafeBoardResponse = cafeBoardService.updateCafeBoard(cafeBoardRequest, cafeId,cafeBoardId);
+    public ResponseEntity<CafeBoardResponse> updateCafeBoard(@RequestBody @Valid CafeBoardRequest cafeBoardRequest, @PathVariable Long cafeBoardId) {
+        CafeBoardResponse cafeBoardResponse = cafeBoardService.updateCafeBoard(cafeBoardRequest, cafeBoardId);
         return ResponseEntity.status(HttpStatus.OK).body(cafeBoardResponse);
     }
 

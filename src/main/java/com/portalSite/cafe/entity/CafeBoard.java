@@ -1,5 +1,6 @@
 package com.portalSite.cafe.entity;
 
+import com.portalSite.cafe.dto.CafeBoardRequest;
 import com.portalSite.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,4 +24,17 @@ public class CafeBoard extends BaseEntity {
     @Column(name = "board_name")
     private String boardName;
 
+
+    private CafeBoard(Cafe cafe, String boardName) {
+        this.cafe = cafe;
+        this.boardName = boardName;
+    }
+
+    public static CafeBoard of(Cafe cafe, String boardName) {
+        return new CafeBoard(cafe, boardName);
+    }
+
+    public void update(CafeBoardRequest cafeBoard) {
+        this.boardName = cafeBoard.boardName();
+    }
 }
