@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -36,6 +37,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
+    @Setter
     @Column(nullable = false)
     private String content;
 
