@@ -16,9 +16,9 @@ public class CafePostController {
 
     private final CafePostService cafePostService;
 
-    @PostMapping("/cafes/{cafeId}/cafe-boards/{cafeBoardId}/cafe-posts")
-    public ResponseEntity<CafePostResponse> addCafePost(@RequestBody CafePostRequest cafePostRequest, @PathVariable Long cafeId, @PathVariable Long cafeBoardId) {
-        CafePostResponse cafePostResponse = cafePostService.addCafePost(cafePostRequest, cafeId, cafeBoardId);
+    @PostMapping("/cafes/{cafeId}/members/{memberId}/cafe-boards/{cafeBoardId}/cafe-posts")
+    public ResponseEntity<CafePostResponse> addCafePost(@RequestBody CafePostRequest cafePostRequest, @PathVariable Long cafeId, @PathVariable Long cafeBoardId,@PathVariable Long memberId) {
+        CafePostResponse cafePostResponse = cafePostService.addCafePost(cafePostRequest, cafeId, cafeBoardId,memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(cafePostResponse);
     }
 

@@ -1,5 +1,6 @@
 package com.portalSite.cafe.entity;
 
+import com.portalSite.cafe.dto.CafePostRequest;
 import com.portalSite.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -44,5 +45,10 @@ public class CafePost extends BaseEntity {
 
     public static CafePost of(Cafe cafe, CafeBoard cafeBoard, CafeMember cafeMember, String title, String description) {
         return new CafePost(cafe, cafeBoard, cafeMember, title, description);
+    }
+
+    public void update(CafePostRequest cafePostRequest) {
+        this.title = cafePostRequest.title();
+        this.description = cafePostRequest.description();
     }
 }
