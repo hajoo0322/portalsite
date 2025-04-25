@@ -16,19 +16,19 @@ public class CafeLevel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cafe_id")
+    @JoinColumn(name = "cafe_id",nullable = false)
     private Cafe cafe;
 
-    @Column(name = "grade")
+    @Column(name = "grade",length = 12)
     private String grade;
 
-    @Column(name = "description")
+    @Column(name = "description",columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "auto_level")
+    @Column(name = "auto_level",nullable = false)
     private Boolean autoLevel;
 
-    @Column(name = "grade_order")
+    @Column(name = "grade_order",nullable = false)
     private Integer gradeOrder;
 
     private CafeLevel(Cafe cafe, String grade, String description, Boolean autoLevel, Integer gradeOrder) {
