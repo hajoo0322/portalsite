@@ -9,7 +9,7 @@ public record CafeResponse(
         String description,
         CafeRanking cafeRanking
 ) {
-    public static CafeResponse of(Cafe cafe) {
+    public static CafeResponse from(Cafe cafe) {
         return new CafeResponse(
                 cafe.getId(),
                 cafe.getCafeName(),

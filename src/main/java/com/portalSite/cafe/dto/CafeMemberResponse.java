@@ -10,7 +10,7 @@ public record CafeMemberResponse(
         String nickname
 
 ) {
-    public static CafeMemberResponse of(CafeMember cafeMember) {
+    public static CafeMemberResponse from(CafeMember cafeMember) {
         return new CafeMemberResponse(cafeMember.getId(),cafeMember.getCafe().getId(),cafeMember.getCafeGrade(),cafeMember.getVisitCount(),cafeMember.getNickname());
     }
 }

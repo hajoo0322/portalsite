@@ -31,13 +31,13 @@ public class CafeMemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel.getGrade(), cafeMemberRequest.nickname());
-        return CafeMemberResponse.of(cafeMember);
+        return CafeMemberResponse.from(cafeMember);
     }
 
     @Transactional(readOnly = true)
     public CafeMemberResponse getCafeMember(Long memberId, Long cafeId) {
         CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
-        return CafeMemberResponse.of(cafeMember);
+        return CafeMemberResponse.from(cafeMember);
     }
 
     @Transactional(readOnly = true)
@@ -46,7 +46,7 @@ public class CafeMemberService {
         if (cafeMemberList.isEmpty()) {
             throw new RuntimeException("");
         }
-        return cafeMemberList.stream().map(CafeMemberResponse::of).toList();
+        return cafeMemberList.stream().map(CafeMemberResponse::from).toList();
     }
 
     @Transactional
@@ -54,7 +54,7 @@ public class CafeMemberService {
         CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         cafeMember.update(cafeMemberRequest);
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
-        return CafeMemberResponse.of(savedCafeMember);
+        return CafeMemberResponse.from(savedCafeMember);
     }
 
     @Transactional

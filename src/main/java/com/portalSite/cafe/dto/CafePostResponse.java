@@ -10,7 +10,7 @@ public record CafePostResponse(
         String title,
         String description
 ) {
-    public static CafePostResponse of(CafePost cafePost) {
+    public static CafePostResponse from(CafePost cafePost) {
         return new CafePostResponse(
                 cafePost.getId(),
                 cafePost.getCafe().getId(),
