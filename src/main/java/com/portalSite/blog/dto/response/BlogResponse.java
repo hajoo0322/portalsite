@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 public class BlogResponse {
 
 
-    private final Long blogId;
+    private final Long id;
     private final Long memberId;
     private final String name;
     private final String description;
