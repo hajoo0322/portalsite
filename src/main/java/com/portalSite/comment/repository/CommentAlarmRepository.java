@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentAlarmRepository extends JpaRepository<CommentAlarm, Long> {
+
     List<CommentAlarm> findByCafePostAndCafeMemberNot(CafePost post, CafeMember member);
+
     Optional<CommentAlarm> findByCafeMemberAndCafePost(CafeMember member, CafePost post);
+
+    List<CafeMember> findByCafePostId(Long cafePostId);
 }
