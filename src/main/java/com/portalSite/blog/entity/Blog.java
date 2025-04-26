@@ -1,6 +1,5 @@
 package com.portalSite.blog.entity;
 
-import com.portalSite.blog.dto.response.BlogResponse;
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
 import jakarta.persistence.Column;

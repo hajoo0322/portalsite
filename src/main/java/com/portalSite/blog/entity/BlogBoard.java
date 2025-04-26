@@ -1,6 +1,5 @@
 package com.portalSite.blog.entity;
 
-import com.portalSite.blog.entity.Blog;
 import com.portalSite.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

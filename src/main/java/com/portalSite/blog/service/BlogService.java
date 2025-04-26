@@ -5,12 +5,10 @@ import com.portalSite.blog.dto.request.UpdateBlogRequest;
 import com.portalSite.blog.dto.response.BlogResponse;
 import com.portalSite.blog.entity.Blog;
 import com.portalSite.blog.repository.BlogRepository;
-
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +21,8 @@ public class BlogService {
     private final MemberRepository memberRepository;
 
     public BlogResponse saveBlog(CreateBlogRequest request, Long memberId){
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new ("존재하지 않는 유저입니다."))
-        Blog blog = Blog.of(, request.getName(),request.getDescription());
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new RuntimeException("존재하지 않는 유저입니다."));
+        Blog blog = Blog.of(member, request.getName(),request.getDescription());
 
          return BlogResponse.from(blogRepository.save(blog));
     }
@@ -37,7 +35,7 @@ public class BlogService {
 
     @Transactional(readOnly = true)
     public BlogResponse getBlog(Long blogId) {
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new NotFoundException("존재하지 않는 블로그입니다."));
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
         return BlogResponse.from(blog);
     }
 

@@ -1,12 +1,9 @@
 package com.portalSite.blog.controller;
 
 import com.portalSite.blog.dto.request.CreateBlogRequest;
-import com.portalSite.blog.dto.request.UpdateBlogBoardRequest;
 import com.portalSite.blog.dto.request.UpdateBlogRequest;
 import com.portalSite.blog.dto.response.BlogResponse;
 import com.portalSite.blog.service.BlogService;
-import com.portalSite.blog.dto.BlogRequest;
-import com.portalSite.blog.dto.BlogResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/user/{userId}/blog")
+@RequestMapping("api/user/{userId}/blog") //인증인가 없어서 일단 일케 해놓음
 public class BlogController {
 
     private final BlogService blogService;
 
     @PostMapping
-    public ResponseEntity<BlogResponse> createBlog(@RequestBody @Valid CreateBlogRequest request) {
-        BlogResponse response = blogService.saveBlog(request);
+    public ResponseEntity<BlogResponse> createBlog(@RequestBody @Valid CreateBlogRequest request, @PathVariable Long userId) {
+        BlogResponse response = blogService.saveBlog(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<BlogResponse>> getAllBlogs(@PathVariable Long blogId) {
+    public ResponseEntity<List<BlogResponse>> getAllBlogs() {
         List<BlogResponse> response = blogService.getAllBlogs();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
