@@ -43,7 +43,7 @@ public class CommentService {
             commentList = commentRepository.findAllByCafe(cafe);
         } else if (type.equals("news")) {
             News news = newsRepository.findById(postId);
-            commentList = commentRepository.findAllByNews(request.news());
+            commentList = commentRepository.findAllByNews(news);
         } else {
             throw new RuntimeException("하나 이상의 게시글 정보를 입력해주세요");
         }
