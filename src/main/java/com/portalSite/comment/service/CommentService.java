@@ -28,7 +28,7 @@ public class CommentService {
         Comment comment = Comment.of(member, commentRequest.blog(), commentRequest.news(),
                 commentRequest.cafe(), commentRequest.content());
         commentRepository.save(comment);
-        return CommentResponse.of(comment);
+        return CommentResponse.from(comment);
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +49,7 @@ public class CommentService {
         }
 
         List<CommentResponse> responseList = commentList.stream().
-                map(CommentResponse::of).collect(Collectors.toList());
+                map(CommentResponse::from).collect(Collectors.toList());
         return responseList;
     }
 
@@ -57,7 +57,7 @@ public class CommentService {
     public CommentResponse updateComment(Long commentId, CommentRequest commentRequest) {
         Comment foundComment = commentRepository.findById(commentId).orElseThrow();
         foundComment.setContent(commentRequest.content());
-        return CommentResponse.of(foundComment);
+        return CommentResponse.from(foundComment);
     }
 
     @Transactional

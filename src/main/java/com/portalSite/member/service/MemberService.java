@@ -18,14 +18,14 @@ public class MemberService {
     public MemberResponse registerMember(MemberRequest memberRequest) {
         Member member = Member.of(memberRequest);
         memberRepository.save(member);
-        return MemberResponse.of(member);
+            return MemberResponse.from(member);
     }
 
     @Transactional
     public MemberResponse getMember(Long memberId) {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
-        return MemberResponse.of(foundMember);
+        return MemberResponse.from(foundMember);
     }
 
     /**
@@ -38,7 +38,7 @@ public class MemberService {
         Member foundMember = validId(memberId, currentId);
 
         foundMember.updateInfo(request);
-        return MemberResponse.of(foundMember);
+        return MemberResponse.from(foundMember);
     }
 
     /**
@@ -52,7 +52,7 @@ public class MemberService {
         Member foundMember = validId(memberId, currentId);
         validPassword(foundMember, request.oldPassword());
         foundMember.updatePassword(request.newPassword());
-        return MemberResponse.of(foundMember);
+        return MemberResponse.from(foundMember);
     }
 
     /**
@@ -67,7 +67,7 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
         foundMember.changeMemberRole(role);
-        return MemberResponse.of(foundMember);
+        return MemberResponse.from(foundMember);
     }
 
     /**
@@ -101,7 +101,7 @@ public class MemberService {
         }
 
         foundMember.restore();
-        return MemberResponse.of(foundMember);
+        return MemberResponse.from(foundMember);
     }
 
     /**

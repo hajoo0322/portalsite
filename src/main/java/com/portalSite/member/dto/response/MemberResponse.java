@@ -17,7 +17,7 @@ public record MemberResponse(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static MemberResponse of(Member member) {
+    public static MemberResponse from(Member member) {
         return new MemberResponse(
                 member.getId(),
                 member.getEmail(),
