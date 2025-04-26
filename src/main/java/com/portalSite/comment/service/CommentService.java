@@ -3,13 +3,15 @@ package com.portalSite.comment.service;
 import com.portalSite.blog.entity.Blog;
 import com.portalSite.blog.repository.BlogRepository;
 import com.portalSite.cafe.entity.Cafe;
-import com.portalSite.cafe.repository.CafeRepository;
+import com.portalSite.cafe.entity.CafePost;
+import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.dto.request.CommentRequest;
 import com.portalSite.comment.dto.response.CommentResponse;
 import com.portalSite.comment.entity.Comment;
 import com.portalSite.comment.event.CommentCreatedEvent;
 import com.portalSite.comment.repository.CommentRepository;
 import com.portalSite.member.entity.Member;
+import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.entity.News;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,14 +27,17 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
     private final CommentRepository commentRepository;
     private final BlogRepository blogRepository;
-    private final CafeRepository cafeRepository;
+    private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public CommentResponse createComment(CommentRequest commentRequest, Member member) {
-        Comment comment = Comment.of(member, commentRequest.blog(), commentRequest.news(),
-                commentRequest.cafe(), commentRequest.content());
-        eventPublisher.publishEvent(new CommentCreatedEvent(comment));
+    public CommentResponse createComment(CommentRequest commentRequest, Long memberId) {
+        Member foundMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException(""));
+        Comment comment = Comment.of(foundMember, commentRequest.blog(), commentRequest.news(),
+                commentRequest.cafePost(), commentRequest.content());
+        eventPublisher.publishEvent(new CommentCreatedEvent(foundMember, commentRequest.cafePost(), comment));
         commentRepository.save(comment);
         return CommentResponse.from(comment);
     }
@@ -46,9 +51,9 @@ public class CommentService {
                     () -> new RuntimeException(""));
             commentList = commentRepository.findAllByBlog(blog);
         } else if (type.equals("cafe")) {
-            Cafe cafe = cafeRepository.findById(postId).orElseThrow(
+            CafePost cafePost = cafePostRepository.findById(postId).orElseThrow(
                     () -> new RuntimeException(""));
-            commentList = commentRepository.findAllByCafe(cafe);
+            commentList = commentRepository.findAllByCafePost(cafePost);
         } else if (type.equals("news")) {
             News news = newsRepository.findById(postId).orElseThrow(
                     () -> new RuntimeException(""));
