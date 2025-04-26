@@ -14,7 +14,6 @@ import com.portalSite.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -29,33 +28,38 @@ public class BlogPostService {
 
 
     public BlogPostResponse saveBlogPost(CreateBlogPostRequest request, Long blogId, Long blogBoardId, Long memberId) {
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException(""));
-        BlogBoard blogBoard = blogBoardRepository.findById(blogBoardId).orElseThrow(() -> new RuntimeException(""));
-        Member blogMember = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
-        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.title(), request.description());
-        BlogPost savedBlogPost = blogPostRepository.save(blogPost);
-        return BlogPostResponse.of(savedBlogPost);
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
+        BlogBoard blogBoard = blogBoardRepository.findById(blogBoardId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
+        Member blogMember = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.getTitle(), request.getDescription());
+
+        return BlogPostResponse.from(blogPostRepository.save(blogPost));
     }
 
     @Transactional(readOnly = true)
     public List<BlogPostResponse> getAllBlogPostByBlogId(Long blogId) {
         List<BlogPost> blogPostList = blogPostRepository.findAllByBlogId(blogId);
-        if (blogPostList.isEmpty()) {
-            throw new RuntimeException("");
-        }
-        return blogPostList.stream().map(BlogPostResponse::of).toList();
+
+        return blogPostList.stream().map(BlogPostResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<BlogPostResponse> getAllBlogPostByBlogBoardId(Long blogboardId) {
+        List<BlogPost> blogPostList = blogPostRepository.findAllByBlogBoardId(blogboardId);
+
+        return blogPostList.stream().map(BlogPostResponse::from).toList();
+    }
 
     public BlogPostResponse updateBlogPost(UpdateBlogPostRequest request, Long blogPostId) {
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException(""));
-        blogPost.update(request);
-        BlogPost savedBlogPost = blogPostRepository.save(blogPost);
-        return BlogPostResponse.of(savedBlogPost);
+        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
+        BlogBoard blogBoard = blogBoardRepository.findById(request.getBlogBoardId()).orElseThrow(()-> new RuntimeException("존제하지 않는 게시판입니."));
+        blogPost.update(blogBoard, request.getTitle(),request.getDescription());
+
+        return BlogPostResponse.from(blogPostRepository.save(blogPost));
     }
 
     public void deleteBlogPost(Long blogPostId) {
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException(""));
+        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
         blogPostRepository.delete(blogPost);
     }
 }

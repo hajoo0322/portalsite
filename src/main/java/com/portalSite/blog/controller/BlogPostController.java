@@ -30,26 +30,26 @@ public class BlogPostController {
                                                             @PathVariable Long blogId,
                                                             @PathVariable Long blogBoardId,
                                                             @PathVariable Long memberId) {
-        BlogPostResponse blogPostResponse = blogPostService.saveBlogPost(request, blogId, blogBoardId,memberId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(blogPostResponse);
+        BlogPostResponse response = blogPostService.saveBlogPost(request, blogId, blogBoardId,memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<BlogPostResponse>> getAllBlogPostByCategoryId(@PathVariable Long blogId) {
-        List<BlogPostResponse> blogPostResponseList = blogPostService.getAllBlogPostByBlogId(blogId);
-        return ResponseEntity.status(HttpStatus.OK).body(blogPostResponseList);
+    public ResponseEntity<List<BlogPostResponse>> getAllBlogPostByBlogBoardId(@PathVariable Long blogBoardId) {
+        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogId(blogBoardId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{blogPostId}")
     public ResponseEntity<List<BlogPostResponse>> getBlogPost(@PathVariable Long blogId) {
-        List<BlogPostResponse> blogPostResponseList = blogPostService.getAllBlogPostByBlogId(blogId);
-        return ResponseEntity.status(HttpStatus.OK).body(blogPostResponseList);
+        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogBoardId(blogId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{blogPostId}")
     public ResponseEntity<BlogPostResponse> updateBlogPost(@RequestBody UpdateBlogPostRequest request, @PathVariable Long blogPostId) {
-        BlogPostResponse blogPostResponse = blogPostService.updateBlogPost(request, blogPostId);
-        return ResponseEntity.status(HttpStatus.OK).body(blogPostResponse);
+        BlogPostResponse response = blogPostService.updateBlogPost(request, blogPostId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{blogPostId}")

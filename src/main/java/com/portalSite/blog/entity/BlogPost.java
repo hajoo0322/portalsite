@@ -3,6 +3,7 @@ package com.portalSite.blog.entity;
 
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,8 +46,8 @@ public class BlogPost extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "blog_post")
-    private List<BlogHashtag> hashtagList;
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+//    private List<BlogHashtag> hashtagList;
 
 
     private BlogPost(Blog blog, BlogBoard blogBoard, Member blogMember, String title, String description) {
@@ -62,7 +63,7 @@ public class BlogPost extends BaseEntity {
     }
 
     public void update(BlogBoard blogBoard, String title, String description) {
-        this.blogBoard = blogBoard
+        this.blogBoard = blogBoard;
         this.title = title;
         this.description = description;
     }

@@ -13,5 +13,5 @@ public class CreateBlogPostRequest {
     @NotBlank(message = "제목은 비워둘 수 없습니다.")
     private final String title;
     private final String description;
-    private final List<HashtagRequest> hashtags;
+//    private final List<HashtagRequest> hashtags;
 }

@@ -12,9 +12,8 @@ public class BlogPostResponse {
     private final String title;
     private final String description;
 
-    public static BlogResponse from(BlogPost post){
-        return new BlogResponse(post.getId(),post.getMember().getId(), post.getTitle(),
-            post.getDescription());
+    public static BlogPostResponse from(BlogPost post){
+        return new BlogPostResponse(post.getId(),post.getMember().getId(), post.getTitle(), post.getDescription());
     }
 
 }
