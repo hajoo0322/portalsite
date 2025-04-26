@@ -8,7 +8,7 @@ public record CafeBoardResponse(
         String boardName
 ) {
 
-    public static CafeBoardResponse of(CafeBoard cafeBoard) {
+    public static CafeBoardResponse from(CafeBoard cafeBoard) {
         return new CafeBoardResponse(cafeBoard.getId(), cafeBoard.getCafe().getId(), cafeBoard.getBoardName());
     }
 }

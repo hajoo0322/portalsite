@@ -28,7 +28,7 @@ public class CafeLevelService {
                 .map(req -> CafeLevel.of(cafe, req.grade(), req.description(), req.autoLevel(), req.gradeOrder())).toList();
         List<CafeLevel> savedCafeLevelList = cafeLevelRepository.saveAll(cafeLevelList);
 
-        return savedCafeLevelList.stream().map(CafeLevelResponse::of).toList();
+        return savedCafeLevelList.stream().map(CafeLevelResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +37,7 @@ public class CafeLevelService {
         if (cafeLevelList.isEmpty()) {
             throw new RuntimeException("");
         }
-        return cafeLevelList.stream().map(CafeLevelResponse::of).toList();
+        return cafeLevelList.stream().map(CafeLevelResponse::from).toList();
     }
 
     @Transactional
@@ -71,7 +71,7 @@ public class CafeLevelService {
 
         List<CafeLevel> savedCafeLevelList = cafeLevelRepository.saveAll(levelsToSave);
         cafeLevelRepository.deleteAll(deleteList);
-        return savedCafeLevelList.stream().map(CafeLevelResponse::of).toList();
+        return savedCafeLevelList.stream().map(CafeLevelResponse::from).toList();
     }
 
 }

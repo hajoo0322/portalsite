@@ -32,7 +32,7 @@ public class CafePostService {
         CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         CafePost cafePost = CafePost.of(cafe, cafeBoard, cafeMember, cafePostRequest.title(), cafePostRequest.description());
         CafePost savedCafePost = cafePostRepository.save(cafePost);
-        return CafePostResponse.of(savedCafePost);
+        return CafePostResponse.from(savedCafePost);
     }
 
     @Transactional(readOnly = true)
@@ -41,7 +41,7 @@ public class CafePostService {
         if (cafePostList.isEmpty()) {
             throw new RuntimeException("");
         }
-        return cafePostList.stream().map(CafePostResponse::of).toList();
+        return cafePostList.stream().map(CafePostResponse::from).toList();
     }
 
     @Transactional
@@ -49,7 +49,7 @@ public class CafePostService {
         CafePost cafePost = cafePostRepository.findById(cafePostId).orElseThrow(() -> new RuntimeException(""));
         cafePost.update(cafePostRequest);
         CafePost savedCafePost = cafePostRepository.save(cafePost);
-        return CafePostResponse.of(savedCafePost);
+        return CafePostResponse.from(savedCafePost);
     }
     @Transactional
     public void deleteCafePost(Long cafePostId) {

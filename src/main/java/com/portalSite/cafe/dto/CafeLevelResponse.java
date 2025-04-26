@@ -9,7 +9,7 @@ public record CafeLevelResponse(
         String description,
         Boolean autoLevel
 ) {
-    public static CafeLevelResponse of(CafeLevel cafeLevel) {
+    public static CafeLevelResponse from(CafeLevel cafeLevel) {
         return new CafeLevelResponse(cafeLevel.getId(), cafeLevel.getCafe().getId(), cafeLevel.getGrade(), cafeLevel.getDescription(), cafeLevel.getAutoLevel());
     }
 }
