@@ -3,7 +3,6 @@ package com.portalSite.comment.controller;
 import com.portalSite.comment.dto.request.CommentRequest;
 import com.portalSite.comment.dto.response.CommentResponse;
 import com.portalSite.comment.service.CommentService;
-import com.portalSite.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +16,11 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping
+    @PostMapping("/{memberId}")
     public ResponseEntity<CommentResponse> createComment(
             @RequestBody CommentRequest commentRequest,
-            @RequestBody Member member) {
-        CommentResponse response = commentService.createComment(commentRequest, member);
+            @PathVariable Long memberId) {
+        CommentResponse response = commentService.createComment(commentRequest, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
