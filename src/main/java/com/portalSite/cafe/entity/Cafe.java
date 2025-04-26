@@ -21,10 +21,11 @@ public class Cafe extends BaseEntity {
     private String cafeName;
 
     @Setter
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "cafe_ranking",length = 12)
     private CafeRanking cafeRanking;
 
 

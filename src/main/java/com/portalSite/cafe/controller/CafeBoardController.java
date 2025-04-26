@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cafes/{cafeId}/cafe-board")
+@RequestMapping("/cafes/{cafeId}/cafe-boards")
 @RequiredArgsConstructor
 public class CafeBoardController {
 

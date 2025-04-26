@@ -1,5 +1,7 @@
 package com.portalSite.like.entity;
 
+import com.portalSite.cafe.entity.CafeMember;
+import com.portalSite.cafe.entity.CafePost;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

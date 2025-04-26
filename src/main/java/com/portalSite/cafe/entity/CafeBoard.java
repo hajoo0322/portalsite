@@ -18,10 +18,10 @@ public class CafeBoard extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cafe_id")
+    @JoinColumn(name = "cafe_id",nullable = false)
     private Cafe cafe;
 
-    @Column(name = "board_name")
+    @Column(name = "board_name",length = 30)
     private String boardName;
 
 
