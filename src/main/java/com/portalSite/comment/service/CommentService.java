@@ -13,6 +13,7 @@ import com.portalSite.comment.repository.CommentRepository;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.entity.News;
+import com.portalSite.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,11 @@ public class CommentService {
                 () -> new RuntimeException(""));
         Comment comment = Comment.of(foundMember, commentRequest.blog(), commentRequest.news(),
                 commentRequest.cafePost(), commentRequest.content());
-        eventPublisher.publishEvent(new CommentCreatedEvent(foundMember, commentRequest.cafePost(), comment));
+
         commentRepository.save(comment);
+
+        eventPublisher.publishEvent(new CommentCreatedEvent(comment.getCafePost(), comment)); // 댓글 저장후 알림 발송
+
         return CommentResponse.from(comment);
     }
 
