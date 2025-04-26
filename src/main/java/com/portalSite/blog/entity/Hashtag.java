@@ -32,8 +32,4 @@ public class Hashtag extends BaseEntity {
         return new Hashtag(tag);
     }
 
-    @Override
-    public String toString() {
-        return tag;
-    }
 }

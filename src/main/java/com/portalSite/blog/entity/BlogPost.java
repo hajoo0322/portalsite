@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -46,9 +47,21 @@ public class BlogPost extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-//    private List<BlogHashtag> hashtagList;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<BlogHashtag> hashtagList = new ArrayList<>();
 
+
+    public void update(BlogBoard blogBoard, String title, String description) {
+        this.blogBoard = blogBoard == null ? this.blogBoard : blogBoard;
+        this.title = title == null ? this.title : title;
+        this.description = description == null ? this.description : description;
+        hashtagList.clear();
+    }
+
+    public void addHashtag(Hashtag hashtag) {
+        BlogHashtag postHashtag = BlogHashtag.of(this, hashtag);
+        hashtagList.add(postHashtag);
+    }
 
     private BlogPost(Blog blog, BlogBoard blogBoard, Member blogMember, String title, String description) {
         this.blog = blog;
@@ -60,11 +73,5 @@ public class BlogPost extends BaseEntity {
 
     public static BlogPost of(Blog blog, BlogBoard blogBoard, Member blogMember, String title, String description) {
         return new BlogPost(blog, blogBoard, blogMember, title, description);
-    }
-
-    public void update(BlogBoard blogBoard, String title, String description) {
-        this.blogBoard = blogBoard;
-        this.title = title;
-        this.description = description;
     }
 }
