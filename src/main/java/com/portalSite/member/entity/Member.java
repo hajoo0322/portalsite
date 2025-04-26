@@ -1,6 +1,8 @@
 package com.portalSite.member.entity;
 
 import com.portalSite.common.BaseEntity;
+import com.portalSite.member.dto.request.MemberRequest;
+import com.portalSite.member.dto.request.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,12 +53,33 @@ public class Member extends BaseEntity {
         this.memberRole = memberRole;
     }
 
-    public static Member of(String email, String loginId, String password, String name, String phoneNumber, String nickname) {
-        return new Member(email, loginId, password, name, phoneNumber, nickname, MemberRole.USER);
+    public static Member of(MemberRequest request) {
+        return new Member(
+                request.email(),
+                request.loginId(),
+                request.password(),
+                request.name(),
+                request.phoneNumber(),
+                request.nickname(),
+                MemberRole.USER);
     }
 
-    public void changeMemberRole(MemberRole memberRole) {
-        this.memberRole = memberRole;
+    public void updateInfo(MemberUpdateRequest request) {
+        this.phoneNumber = request.phoneNumber();
+        this.nickname = request.nickname();
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeMemberRole(String memberRole) {
+        if (memberRole.equalsIgnoreCase("user")) {
+            this.memberRole = MemberRole.USER;
+        } else if (memberRole.equalsIgnoreCase("admin")) {
+            this.memberRole = MemberRole.ADMIN;
+        }
+        throw new RuntimeException("");
     }
 
     public void softDelete () {

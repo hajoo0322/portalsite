@@ -17,7 +17,7 @@ public record CommentResponse(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static CommentResponse of(Comment comment) {
+    public static CommentResponse from(Comment comment) {
         return new CommentResponse(
                 comment.getId(),
                 comment.getMember(),

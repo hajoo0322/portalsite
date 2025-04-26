@@ -24,7 +24,7 @@ public class CafeBoardService {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeBoard cafeBoard = CafeBoard.of(cafe, cafeBoardRequest.boardName());
         CafeBoard savedCafeBoard = cafeBoardRepository.save(cafeBoard);
-        return CafeBoardResponse.of(savedCafeBoard);
+        return CafeBoardResponse.from(savedCafeBoard);
     }
 
     @Transactional(readOnly = true)
@@ -34,7 +34,7 @@ public class CafeBoardService {
             throw new RuntimeException("");
         }
 
-        return cafeBoardList.stream().map(CafeBoardResponse::of).toList();
+        return cafeBoardList.stream().map(CafeBoardResponse::from).toList();
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class CafeBoardService {
         CafeBoard cafeBoard = cafeBoardRepository.findById(cafeBoardId).orElseThrow(() -> new RuntimeException(""));
         cafeBoard.update(cafeBoardRequest);
         CafeBoard savedCafeBoard = cafeBoardRepository.save(cafeBoard);
-        return CafeBoardResponse.of(savedCafeBoard);
+        return CafeBoardResponse.from(savedCafeBoard);
     }
 
     @Transactional

@@ -22,6 +22,6 @@ public class NoDuplicateGradeOrderValidator implements ConstraintValidator<NoDup
 
         Set<Integer> uniqueOrders = new HashSet<>(orders);
 
-        return uniqueOrders.size() ==orders.size();
+        return uniqueOrders.size() == orders.size();
     }
 }

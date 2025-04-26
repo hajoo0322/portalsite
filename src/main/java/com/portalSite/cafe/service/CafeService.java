@@ -23,13 +23,13 @@ public class CafeService{
     public CafeResponse addCafe(CafeRequest requestCafe) {
         Cafe cafe = Cafe.of(requestCafe.cafeName(), requestCafe.description());
         Cafe savedCafe = cafeRepository.save(cafe);
-        return CafeResponse.of(savedCafe);
+        return CafeResponse.from(savedCafe);
     }
 
     @Transactional(readOnly = true)
     public CafeResponse getCafe(Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
-        return CafeResponse.of(cafe);
+        return CafeResponse.from(cafe);
     }
 
     @Transactional
@@ -37,7 +37,7 @@ public class CafeService{
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         cafe.setCafeName(requestCafe.cafeName());
         cafe.setDescription(requestCafe.description());
-        return CafeResponse.of(cafe);
+        return CafeResponse.from(cafe);
     }
 
     @Transactional
