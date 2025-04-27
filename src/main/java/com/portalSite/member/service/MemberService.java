@@ -15,13 +15,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberResponse registerMember(MemberRequest memberRequest) {
-        Member member = Member.of(memberRequest);
-        memberRepository.save(member);
-            return MemberResponse.from(member);
-    }
-
-    @Transactional
     public MemberResponse getMember(Long memberId) {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));

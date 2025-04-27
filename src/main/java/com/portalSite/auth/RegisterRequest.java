@@ -1,8 +1,8 @@
-package com.portalSite.member.dto.request;
+package com.portalSite.auth;
 
 import jakarta.validation.constraints.*;
 
-public record MemberRequest(
+public record RegisterRequest(
         @NotBlank(message = "사용하실 이메일을 입력해주세요.")
         @Email(message = "이메일 양식에 맞춰 입력해주세요.")
         String email,

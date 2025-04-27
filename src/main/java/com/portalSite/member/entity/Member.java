@@ -1,7 +1,7 @@
 package com.portalSite.member.entity;
 
 import com.portalSite.common.BaseEntity;
-import com.portalSite.member.dto.request.MemberRequest;
+import com.portalSite.auth.RegisterRequest;
 import com.portalSite.member.dto.request.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -53,11 +53,11 @@ public class Member extends BaseEntity {
         this.memberRole = memberRole;
     }
 
-    public static Member of(MemberRequest request) {
+    public static Member of(RegisterRequest request, String password) {
         return new Member(
                 request.email(),
                 request.loginId(),
-                request.password(),
+                password,
                 request.name(),
                 request.phoneNumber(),
                 request.nickname(),

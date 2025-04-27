@@ -1,0 +1,12 @@
+###### 본인이 쓰고 있는 yml 파일에 이거 붙여넣기 하고 주석 해제
+
+#jwt:
+#  secret:
+#    key: "NDkxOWJkYzRmNTU3N2RjMGMyZDFlZmM5NDMxODk3ZTUxYjdkZDNkOGZmNzU2YTJiMmQ0ZmNlNzVmYzE1MTRhZA=="
+#    whitelist:
+#      - "/auth/**"
+#    adminlist:
+#      - "/admin/**"
+#  token:
+#    prefix: "Bearer"
+#    expiration: 1800000000

@@ -14,14 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping
-    public ResponseEntity<MemberResponse> createMember(
-            @RequestBody MemberRequest memberRequest
-    ) {
-        MemberResponse response = memberService.registerMember(memberRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberResponse> getMember(
             @PathVariable Long memberId
