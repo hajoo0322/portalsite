@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/user/{userId}/blog") //인증인가 없어서 일단 일케 해놓음
+@RequestMapping("api/member/{memberId}/blog") //인증인가 없어서 일단 일케 해놓음
 public class BlogController {
 
     private final BlogService blogService;
 
     @PostMapping
-    public ResponseEntity<BlogResponse> createBlog(@RequestBody @Valid CreateBlogRequest request, @PathVariable Long userId) {
-        BlogResponse response = blogService.saveBlog(request, userId);
+    public ResponseEntity<BlogResponse> createBlog(@RequestBody @Valid CreateBlogRequest request, @PathVariable Long memberId) {
+        BlogResponse response = blogService.saveBlog(request, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

@@ -9,14 +9,13 @@ import lombok.AllArgsConstructor;
 public class BlogResponse {
 
 
-    private final Long blogId;
+    private final Long id;
     private final Long memberId;
     private final String name;
     private final String description;
 
     public static BlogResponse from(Blog blog){
-        return new BlogResponse(blog.getId(),blog.getMember().getId(), blog.getBlogName(),
-            blog.getDescription());
+        return new BlogResponse(blog.getId(),blog.getMember().getId(), blog.getBlogName(), blog.getDescription());
     }
 
 }

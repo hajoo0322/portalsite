@@ -1,6 +1,8 @@
 package com.portalSite.comment.entity;
 
+import com.portalSite.blog.entity.Blog;
 import com.portalSite.cafe.entity.Cafe;
+import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
 import com.portalSite.news.entity.News;
@@ -35,21 +37,21 @@ public class Comment extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "cafe_id")
-    private Cafe cafe;
+    private CafePost cafePost;
 
     @Setter
     @Column(nullable = false)
     private String content;
 
-    private Comment(Member member, Blog blog, News news, Cafe cafe, String content) {
+    private Comment(Member member, Blog blog, News news, CafePost cafePost, String content) {
         this.member = member;
         this.blog = blog;
         this.news = news;
-        this.cafe = cafe;
+        this.cafePost = cafePost;
         this.content = content;
     }
 
-    public static Comment of(Member member, Blog blog, News news, Cafe cafe, String content) {
-        return new Comment(member, blog, news, cafe, content);
+    public static Comment of(Member member, Blog blog, News news, CafePost cafePost, String content) {
+        return new Comment(member, blog, news, cafePost, content);
     }
 }

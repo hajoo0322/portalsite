@@ -1,16 +1,16 @@
 package com.portalSite.comment.service;
 
 import com.portalSite.cafe.entity.CafeMember;
-import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.comment.dto.request.CommentAlarmRequest;
+import com.portalSite.comment.entity.Comment;
 import com.portalSite.comment.entity.CommentAlarm;
-import com.portalSite.comment.event.CommentCreatedEvent;
 import com.portalSite.comment.repository.CommentAlarmRepository;
+import java.util.List;
+
+import com.portalSite.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,16 +19,14 @@ public class CommentAlarmService {
     private final CommentAlarmRepository commentAlarmRepository;
 
     @Transactional
-    public void sendAlarm(CommentCreatedEvent event) {
-        CafePost cafePost = event.getPost();
+    public void sendAlarm(Member subscriber, Comment newComment) {
+        System.out.println("새로운 댓글 알림: " + newComment.getContent());
+        /*TODO 알림 전송 매체 선택 후 개선 필요*/
+        //매개변수 subscriber는 추후 알림을 받을 사람을 특정하기 위해 필요함
+    }
 
-        List<CommentAlarm> alarms = commentAlarmRepository.findByCafePostAndCafeMemberNot(
-                cafePost, event.getMember()
-        );
-
-        for (CommentAlarm alarm : alarms) {
-            System.out.println("🔔 알람 전송 대상: " + alarm.getCafeMember().getNickname());
-        }
+    public List<CafeMember> findSubscribeMember(Long cafePostId){
+        return commentAlarmRepository.findByCafePostId(cafePostId);
     }
 
     @Transactional
