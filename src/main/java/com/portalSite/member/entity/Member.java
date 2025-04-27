@@ -73,13 +73,8 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void changeMemberRole(String memberRole) {
-        if (memberRole.equalsIgnoreCase("user")) {
-            this.memberRole = MemberRole.USER;
-        } else if (memberRole.equalsIgnoreCase("admin")) {
-            this.memberRole = MemberRole.ADMIN;
-        }
-        throw new RuntimeException("");
+    public void changeMemberRole(MemberRole memberRole) {
+        this.memberRole = memberRole;
     }
 
     public void softDelete () {

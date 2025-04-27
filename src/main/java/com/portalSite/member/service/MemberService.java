@@ -27,8 +27,8 @@ public class MemberService {
      * 3. 정보 수정
      */
     @Transactional
-    public MemberResponse updateMember(Long memberId, Long currentId, MemberUpdateRequest request) {
-        Member foundMember = validId(memberId, currentId);
+    public MemberResponse updateMember(Long memberId, Long loggedInId, MemberUpdateRequest request) {
+        Member foundMember = validId(memberId, loggedInId);
 
         foundMember.updateInfo(request);
         return MemberResponse.from(foundMember);
@@ -41,8 +41,8 @@ public class MemberService {
      * 4. 비밀번호 수정
      */
     @Transactional
-    public MemberResponse changePassword(Long memberId, Long currentId, MemberChangePasswordRequest request) {
-        Member foundMember = validId(memberId, currentId);
+    public MemberResponse changePassword(Long memberId, Long loggedInId, MemberChangePasswordRequest request) {
+        Member foundMember = validId(memberId, loggedInId);
         validPassword(foundMember, request.oldPassword());
         foundMember.updatePassword(request.newPassword());
         return MemberResponse.from(foundMember);
@@ -55,8 +55,8 @@ public class MemberService {
      * 4. 멤버 객체의 권한 수정
      */
     @Transactional
-    public MemberResponse changeMemberRole(Long memberId, Long currentId, String role) {
-        validAdmin(currentId);
+    public MemberResponse changeMemberRole(Long memberId, Long loggedInId, MemberRole role) {
+        validAdmin(loggedInId);
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
         foundMember.changeMemberRole(role);
@@ -70,8 +70,8 @@ public class MemberService {
      * 4. 멤버객체의 isDeleted true로 변환
      */
     @Transactional
-    public void softDeleteMember(Long memberId, Long currentId, MemberDeleteRequest request) {
-        Member foundMember = validId(memberId, currentId);
+    public void softDeleteMember(Long memberId, Long loggedInId, MemberDeleteRequest request) {
+        Member foundMember = validId(memberId, loggedInId);
         validPassword(foundMember, request.password());
         foundMember.softDelete();
     }
@@ -83,8 +83,8 @@ public class MemberService {
      * 4. 일치할 시 멤버 객체의 isDeleted false 로 변환
      */
     @Transactional
-    public MemberResponse restoreMember(MemberRestoreRequest request, Long currentId) {
-        validAdmin(currentId);
+    public MemberResponse restoreMember(MemberRestoreRequest request, Long loggedInId) {
+        validAdmin(loggedInId);
         Member foundMember = memberRepository.findByEmail(request.email()).orElseThrow(
                 () -> new RuntimeException(""));
         if (!foundMember.getPassword().equals(request.password()) ||
@@ -102,12 +102,12 @@ public class MemberService {
      * 2. 대상 id와 로그인한 id가 같은지 검사<br>
      * 3. 위 조건에 걸러지지 않을 경우 대상 id 로 맴버 객체 조회 및 반환
      */
-    private Member validId(Long memberId, Long currentId) {
-        if (memberId == null || currentId == null) {
+    private Member validId(Long memberId, Long loggedInId) {
+        if (memberId == null || loggedInId == null) {
             throw new RuntimeException("");
         }
 
-        if (!memberId.equals(currentId)) {
+        if (!memberId.equals(loggedInId)) {
             throw new RuntimeException("");
         }
 
@@ -121,8 +121,8 @@ public class MemberService {
         }
     }
 
-    private void validAdmin(Long currentId) {
-        Member foundMember = memberRepository.findById(currentId).orElseThrow(
+    private void validAdmin(Long loggedInId) {
+        Member foundMember = memberRepository.findById(loggedInId).orElseThrow(
                 () -> new RuntimeException(""));
         if (foundMember.getMemberRole() != MemberRole.ADMIN) {
             throw new RuntimeException("");
