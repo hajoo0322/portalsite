@@ -16,6 +16,12 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public String register(RegisterRequest request) {
+        if (memberRepository.existsByLoginId(request.loginId())){
+            throw new RuntimeException("중복 id");
+        }
+        if (memberRepository.existsByEmail(request.email())){
+            throw new RuntimeException("중복 이메일");
+        }
         Member member = Member.of(request, passwordEncoder.encode(request.password()));
         memberRepository.save(member);
         String rawToken = jwtUtil.createToken(member.getId(), member.getMemberRole());
