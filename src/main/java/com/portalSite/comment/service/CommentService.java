@@ -1,12 +1,13 @@
 package com.portalSite.comment.service;
 
-import com.portalSite.blog.entity.Blog;
-import com.portalSite.blog.repository.BlogRepository;
+import com.portalSite.blog.entity.BlogPost;
+import com.portalSite.blog.repository.BlogPostRepository;
 import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.dto.request.CommentRequest;
 import com.portalSite.comment.dto.response.CommentResponse;
 import com.portalSite.comment.entity.Comment;
+import com.portalSite.comment.entity.PostType;
 import com.portalSite.comment.event.CommentCreatedEvent;
 import com.portalSite.comment.repository.CommentRepository;
 import com.portalSite.member.entity.Member;
@@ -27,46 +28,64 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
-    private final BlogRepository blogRepository;
-    private final CafePostRepository cafePostRepository;
+    private final BlogPostRepository blogPostRepository;
     private final NewsRepository newsRepository;
+    private final CafePostRepository cafePostRepository;
 
     @Transactional
-    public CommentResponse createComment(CommentRequest commentRequest, Long memberId) {
+    public CommentResponse createComment(PostType postType, Long postId, Long memberId, CommentRequest request) {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
-        Comment comment = Comment.of(foundMember, commentRequest.blog(), commentRequest.news(),
-                commentRequest.cafePost(), commentRequest.content());
+        Comment comment;
 
-        commentRepository.save(comment);
-
-        eventPublisher.publishEvent(new CommentCreatedEvent(comment.getCafePost(), comment)); // 댓글 저장후 알림 발송
-
-        return CommentResponse.from(comment);
-    }
-
-    @Transactional(readOnly = true)
-    public List<CommentResponse> getCommentOfPost(String type, Long postId) {
-        List<Comment> commentList;
-
-        if (type.equals("blog")) {
-            Blog blog = blogRepository.findById(postId).orElseThrow(
+        switch (postType) {
+            case BLOG -> {
+                BlogPost foundBlogPost = blogPostRepository.findById(postId).orElseThrow(
                     () -> new RuntimeException(""));
-            commentList = commentRepository.findAllByBlog(blog);
-        } else if (type.equals("cafe")) {
-            CafePost cafePost = cafePostRepository.findById(postId).orElseThrow(
+                comment = Comment.of(foundMember, foundBlogPost, request.content(), postType);
+            }
+            case CAFE -> {
+                CafePost foundCafePost = cafePostRepository.findById(postId).orElseThrow(
                     () -> new RuntimeException(""));
-            commentList = commentRepository.findAllByCafePost(cafePost);
-        } else if (type.equals("news")) {
-            News news = newsRepository.findById(postId).orElseThrow(
-                    () -> new RuntimeException(""));
-            commentList = commentRepository.findAllByNews(news);
-        } else {
-            throw new RuntimeException("하나 이상의 게시글 정보를 입력해주세요");
+                comment = Comment.of(foundMember, foundCafePost, request.content(), postType);
+            }
+            case NEWS -> {
+                News foundNews = newsRepository.findById(postId).orElseThrow(
+                        () -> new RuntimeException(""));
+                comment = Comment.of(foundMember, foundNews, request.content(), postType);
+            }
+            default -> throw new RuntimeException("");
         }
 
-        return commentList.stream().
-                map(CommentResponse::from).collect(Collectors.toList());
+        commentRepository.save(comment);
+        eventPublisher.publishEvent(new CommentCreatedEvent(comment.getCafePost(), comment)); // 댓글 저장후 알림 발송
+
+        return CommentResponse.from(comment, postType);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getCommentOfPost(PostType type, Long postId) {
+        List<Comment> comments;
+
+        if (type == PostType.BLOG) {
+            BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(
+                    () -> new RuntimeException(""));
+            comments = commentRepository.findAllByBlogPost(blogPost);
+        } else if (type == PostType.CAFE) {
+            CafePost cafePost = cafePostRepository.findById(postId).orElseThrow(
+                    () -> new RuntimeException(""));
+            comments = commentRepository.findAllByCafePost(cafePost);
+        } else if (type == PostType.NEWS) {
+            News news = newsRepository.findById(postId).orElseThrow(
+                    () -> new RuntimeException(""));
+            comments = commentRepository.findAllByNews(news);
+        } else {
+            throw new RuntimeException("");
+        }
+
+        return comments.stream().
+                map(comment -> CommentResponse.from(comment, type)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -74,7 +93,7 @@ public class CommentService {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
         return commentRepository.findAllByMember(foundMember).stream().
-                map(CommentResponse::from).collect(Collectors.toList());
+                map(comment -> CommentResponse.from(comment, )).collect(Collectors.toList());
     }
 
     @Transactional
