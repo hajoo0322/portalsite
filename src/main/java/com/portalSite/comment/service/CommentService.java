@@ -10,6 +10,7 @@ import com.portalSite.comment.entity.Comment;
 import com.portalSite.comment.event.CommentCreatedEvent;
 import com.portalSite.comment.repository.CommentRepository;
 import com.portalSite.member.entity.Member;
+import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.entity.News;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
     private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
     private final BlogRepository blogRepository;
     private final CafeRepository cafeRepository;
     private final NewsRepository newsRepository;
@@ -57,9 +59,16 @@ public class CommentService {
             throw new RuntimeException("하나 이상의 게시글 정보를 입력해주세요");
         }
 
-        List<CommentResponse> responseList = commentList.stream().
+        return commentList.stream().
                 map(CommentResponse::from).collect(Collectors.toList());
-        return responseList;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getCommentOfMember(Long memberId) {
+        Member foundMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException(""));
+        return commentRepository.findAllByMember(foundMember).stream().
+                map(CommentResponse::from).collect(Collectors.toList());
     }
 
     @Transactional
