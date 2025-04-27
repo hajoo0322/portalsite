@@ -1,5 +1,10 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.service;
 
+import com.portalSite.chatbot.entity.ChatbotFaq;
+import com.portalSite.chatbot.repository.ChatbotFaqRepository;
+import com.portalSite.chatbot.dto.AddFaqRequest;
+import com.portalSite.chatbot.dto.ChatbotFaqResponse;
+import com.portalSite.chatbot.dto.UpdateFaqRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

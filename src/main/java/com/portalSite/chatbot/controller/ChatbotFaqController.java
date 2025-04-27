@@ -1,5 +1,9 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.controller;
 
+import com.portalSite.chatbot.service.ChatbotFaqService;
+import com.portalSite.chatbot.dto.AddFaqRequest;
+import com.portalSite.chatbot.dto.ChatbotFaqResponse;
+import com.portalSite.chatbot.dto.UpdateFaqRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

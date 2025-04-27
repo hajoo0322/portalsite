@@ -1,4 +1,4 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.dto;
 
 import com.portalSite.common.valid.NotBlankOrWhitespace;
 

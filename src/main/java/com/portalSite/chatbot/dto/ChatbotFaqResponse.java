@@ -1,4 +1,6 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.dto;
+
+import com.portalSite.chatbot.entity.ChatbotFaq;
 
 public record ChatbotFaqResponse(
         Long faqId,

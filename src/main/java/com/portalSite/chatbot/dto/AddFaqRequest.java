@@ -1,4 +1,4 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

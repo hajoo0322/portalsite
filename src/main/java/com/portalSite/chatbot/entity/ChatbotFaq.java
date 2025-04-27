@@ -1,5 +1,6 @@
-package com.portalSite.chatbot;
+package com.portalSite.chatbot.entity;
 
+import com.portalSite.chatbot.dto.UpdateFaqRequest;
 import com.portalSite.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
