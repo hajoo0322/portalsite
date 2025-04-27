@@ -2,7 +2,6 @@ package com.portalSite.comment.service;
 
 import com.portalSite.blog.entity.Blog;
 import com.portalSite.blog.repository.BlogRepository;
-import com.portalSite.cafe.entity.Cafe;
 import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.dto.request.CommentRequest;
@@ -31,7 +30,6 @@ public class CommentService {
     private final BlogRepository blogRepository;
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     public CommentResponse createComment(CommentRequest commentRequest, Long memberId) {
