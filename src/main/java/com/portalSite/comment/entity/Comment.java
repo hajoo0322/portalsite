@@ -1,15 +1,11 @@
 package com.portalSite.comment.entity;
 
-import com.portalSite.blog.entity.BlogPost;
-import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
-import com.portalSite.news.entity.News;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -26,65 +22,28 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "blog_post_id")
-    private BlogPost blogPost;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_type", nullable = false)
+    private PostType postType;
 
-    @ManyToOne
-    @JoinColumn(name = "news_id")
-    private News news;
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 
-    @ManyToOne
-    @JoinColumn(name = "cafe_post_id")
-    private CafePost cafePost;
-
-    @Setter
     @Column(nullable = false)
     private String content;
 
-    public Comment(Member member, Object post, String content, PostType type) {
-        this.member = member;
+    public void updateContent(String content) {
         this.content = content;
-
-        switch (type) {
-            case BLOG -> this.blogPost = (BlogPost) post;
-            case NEWS -> this.news = (News) post;
-            case CAFE -> this.cafePost = (CafePost) post;
-            default -> throw new RuntimeException("");
-        }
     }
 
-    public static Comment of(Member member, Object post, String content, PostType type) {
-        return new Comment(member, post, content, type);
+    public Comment(Member member, PostType type, Long postId, String content) {
+        this.member = member;
+        this.postType = type;
+        this.postId = postId;
+        this.content = content;
+    }
+
+    public static Comment of(Member member, PostType type, Long postId, String content) {
+        return new Comment(member, type, postId, content);
     }
 }
-
-//    private Comment(Member member, BlogPost blogPost, String content) {
-//        this.member = member;
-//        this.blogPost = blogPost;
-//        this.content = content;
-//    }
-//
-//    public Comment(Member member, News news, String content) {
-//        this.member = member;
-//        this.news = news;
-//        this.content = content;
-//    }
-//
-//    public Comment(Member member, CafePost cafePost, String content) {
-//        this.member = member;
-//        this.cafePost = cafePost;
-//        this.content = content;
-//    }
-
-//    public static Comment of(Member member, BlogPost blogPost, String content) {
-//        return new Comment(member, blogPost, content);
-//    }
-//
-//    public static Comment of(Member member, News news, String content) {
-//        return new Comment(member, news, content);
-//    }
-//
-//    public static Comment of(Member member, CafePost cafePost, String content) {
-//        return new Comment(member, cafePost, content);
-//    }
