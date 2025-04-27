@@ -4,43 +4,45 @@ import com.portalSite.chatbot.service.ChatbotFaqService;
 import com.portalSite.chatbot.dto.AddFaqRequest;
 import com.portalSite.chatbot.dto.ChatbotFaqResponse;
 import com.portalSite.chatbot.dto.UpdateFaqRequest;
+import com.portalSite.member.entity.MemberRole;
+import com.portalSite.security.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/faq")
+@RequestMapping("/admin/faq")
 @RequiredArgsConstructor
+@Secured(MemberRole.Authority.ADMIN)
 public class ChatbotFaqController {
 
     private final ChatbotFaqService chatbotFaqService;
 
     @PostMapping
     public ResponseEntity<ChatbotFaqResponse> addChatbotFaq(
-            //TODO ADMIN authority + memberId
+            @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody AddFaqRequest request
     ) {
-        Long memberId = 1L;
-        ChatbotFaqResponse response = chatbotFaqService.addFaq(memberId, request);
+        ChatbotFaqResponse response = chatbotFaqService.addFaq(authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{faqId}")
     public ResponseEntity<ChatbotFaqResponse> updateChatbotFaq(
-            //TODO ADMIN authority + memberId
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long faqId,
             @Valid @RequestBody UpdateFaqRequest request
     ) {
-        Long memberId = 1L;
-        ChatbotFaqResponse response = chatbotFaqService.updateFaq(faqId, memberId, request);
+        ChatbotFaqResponse response = chatbotFaqService.updateFaq(faqId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //TODO ADMIN authority
     @DeleteMapping("/{faqId}")
     public ResponseEntity<Void> deleteChatbotFaq(
             @PathVariable Long faqId
@@ -49,7 +51,6 @@ public class ChatbotFaqController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    //TODO ADMIN authority
     @GetMapping
     public ResponseEntity<List<ChatbotFaqResponse>> getAllChatbotFaq() {
         List<ChatbotFaqResponse> response = chatbotFaqService.getAllFaq();
