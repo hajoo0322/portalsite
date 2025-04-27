@@ -19,6 +19,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
+        throw new RuntimeException("Unauthorized");
         //TODO exception
     }
 }

@@ -19,6 +19,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
     ) throws IOException {
+        throw new RuntimeException("Forbidden");
         //TODO exception
     }
 }
