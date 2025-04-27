@@ -1,5 +1,7 @@
 package com.portalSite.comment.service;
 
+import com.portalSite.cafe.entity.CafePost;
+import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.dto.request.CommentRequest;
 import com.portalSite.comment.dto.response.CommentResponse;
 import com.portalSite.comment.entity.Comment;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final CafePostRepository cafePostRepository;
     private final MemberRepository memberRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -30,7 +33,11 @@ public class CommentService {
         Comment comment = Comment.of(foundMember, postType, postId, request.content());
 
         commentRepository.save(comment);
-//        eventPublisher.publishEvent(new CommentCreatedEvent(comment.getCafePost(), comment)); // 댓글 저장후 알림 발송
+        if (postType == PostType.CAFE) {
+            CafePost foundCafePost = cafePostRepository.findById(postId).orElseThrow(
+                    () -> new RuntimeException(""));
+            eventPublisher.publishEvent(new CommentCreatedEvent(foundCafePost, comment)); // 댓글 저장후 알림 발송
+        }
 
         return CommentResponse.from(comment);
     }
@@ -51,15 +58,23 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse updateComment(Long commentId, CommentRequest commentRequest) {
+    public CommentResponse updateComment(Long commentId, CommentRequest commentRequest, Long memberId) {
         Comment foundComment = commentRepository.findById(commentId).orElseThrow();
+        validateMember(memberId, foundComment);
         foundComment.updateContent(commentRequest.content());
         return CommentResponse.from(foundComment);
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, Long memberId) {
         Comment foundComment = commentRepository.findById(commentId).orElseThrow();
+        validateMember(memberId, foundComment);
         commentRepository.delete(foundComment);
+    }
+
+    private void validateMember(Long memberId, Comment comment) {
+        if (!comment.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("");
+        }
     }
 }
