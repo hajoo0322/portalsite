@@ -1,16 +1,16 @@
 package com.portalSite.news.controller;
 
+import com.portalSite.member.entity.MemberRole;
 import com.portalSite.news.dto.request.NewsCategoryRequest;
+import com.portalSite.news.dto.response.NewsCategoryListResponse;
 import com.portalSite.news.dto.response.NewsCategoryResponse;
-import com.portalSite.news.entity.NewsCategory;
 import com.portalSite.news.service.NewsCategoryService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,31 +28,27 @@ public class NewsCategoryController {
   private final NewsCategoryService newsCategoryService;
 
   @PostMapping()
-  @PreAuthorize("hasRole('ADMIN')")
+  @Secured(MemberRole.Authority.ADMIN)
   public ResponseEntity<NewsCategoryResponse> createCategory(
       @Valid @RequestBody NewsCategoryRequest request
   ) {
-    NewsCategoryResponse response = NewsCategoryResponse.from(
-        newsCategoryService.createCategory(request));
+    NewsCategoryResponse response = newsCategoryService.createCategory(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @GetMapping("/{categoryId}/subcategories")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<List<NewsCategoryResponse>> getSubCategoriesByParentId(
+  @Secured(MemberRole.Authority.ADMIN)
+  public ResponseEntity<NewsCategoryListResponse> getSubCategoriesByParentId(
       @PathVariable Long categoryId
   ) {
-    List<NewsCategoryResponse> responseList = newsCategoryService
-        .getSubCategoriesByParentId(categoryId).stream()
-        .map(NewsCategoryResponse::from)
-        .toList();
+    NewsCategoryListResponse response = newsCategoryService.getSubCategoriesByParentId(categoryId);
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseList);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @PatchMapping("/{categoryId}")
-  @PreAuthorize("hasRole('ADMIN')")
+  @Secured(MemberRole.Authority.ADMIN)
   public ResponseEntity<NewsCategoryResponse> updateCategory(
     @RequestBody NewsCategoryRequest request,
     @PathVariable Long categoryId
@@ -63,12 +59,12 @@ public class NewsCategoryController {
   }
 
   @DeleteMapping("/{categoryId}")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<Null> deleteCategory(
+  @Secured(MemberRole.Authority.ADMIN)
+  public ResponseEntity<Void> deleteCategory(
       @PathVariable Long categoryId
   ){
     newsCategoryService.deleteCategory(categoryId);
 
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
