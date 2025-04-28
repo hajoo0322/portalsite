@@ -1,7 +1,7 @@
 package com.portalSite.member.entity;
 
 import com.portalSite.common.BaseEntity;
-import com.portalSite.member.dto.request.MemberRequest;
+import com.portalSite.auth.RegisterRequest;
 import com.portalSite.member.dto.request.MemberUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -53,11 +53,11 @@ public class Member extends BaseEntity {
         this.memberRole = memberRole;
     }
 
-    public static Member of(MemberRequest request) {
+    public static Member of(RegisterRequest request, String password) {
         return new Member(
                 request.email(),
                 request.loginId(),
-                request.password(),
+                password,
                 request.name(),
                 request.phoneNumber(),
                 request.nickname(),
@@ -73,13 +73,8 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void changeMemberRole(String memberRole) {
-        if (memberRole.equalsIgnoreCase("user")) {
-            this.memberRole = MemberRole.USER;
-        } else if (memberRole.equalsIgnoreCase("admin")) {
-            this.memberRole = MemberRole.ADMIN;
-        }
-        throw new RuntimeException("");
+    public void changeMemberRole(MemberRole memberRole) {
+        this.memberRole = memberRole;
     }
 
     public void softDelete () {

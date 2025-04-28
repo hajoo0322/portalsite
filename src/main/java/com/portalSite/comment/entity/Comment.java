@@ -1,16 +1,11 @@
 package com.portalSite.comment.entity;
 
-import com.portalSite.blog.entity.Blog;
-import com.portalSite.cafe.entity.Cafe;
-import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.common.BaseEntity;
 import com.portalSite.member.entity.Member;
-import com.portalSite.news.entity.News;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -27,31 +22,28 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "blog_id")
-    private Blog blog;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_type", nullable = false)
+    private PostType postType;
 
-    @ManyToOne
-    @JoinColumn(name = "news_id")
-    private News news;
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 
-    @ManyToOne
-    @JoinColumn(name = "cafe_id")
-    private CafePost cafePost;
-
-    @Setter
     @Column(nullable = false)
     private String content;
 
-    private Comment(Member member, Blog blog, News news, CafePost cafePost, String content) {
-        this.member = member;
-        this.blog = blog;
-        this.news = news;
-        this.cafePost = cafePost;
+    public void updateContent(String content) {
         this.content = content;
     }
 
-    public static Comment of(Member member, Blog blog, News news, CafePost cafePost, String content) {
-        return new Comment(member, blog, news, cafePost, content);
+    public Comment(Member member, PostType type, Long postId, String content) {
+        this.member = member;
+        this.postType = type;
+        this.postId = postId;
+        this.content = content;
+    }
+
+    public static Comment of(Member member, PostType type, Long postId, String content) {
+        return new Comment(member, type, postId, content);
     }
 }

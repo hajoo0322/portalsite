@@ -14,7 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +65,37 @@ public class CafeMemberService {
     public void deleteCafeMember(Long memberId, Long cafeId) {
         CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         cafeMember.delete(true);
+    }
+
+    @Transactional
+    public void upgradeOneCafeMemberGrade(Cafe cafe) {
+        List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeIdOrderByGradeOrderDesc(cafe.getId());
+        Map<String, CafeLevel> gradeToGradeOrder = cafeLevelList.stream().collect(Collectors.toMap(CafeLevel::getGrade, Function.identity()));
+
+        List<CafeMember> cafeMemberList = cafeMemberRepository.findAllByCafeId(cafe.getId());
+        List<CafeMember> membersToUpgradeList = new ArrayList<>();
+
+        // 회원이 조건 만족하면 갱신할 수 있는 가장 높은 등급으로 변경(현재 등급보다 낮은 등급으로는 변동 x)
+        for (CafeMember member : cafeMemberList) {
+            // 등급별 조건 검사
+            for (CafeLevel cafeLevel : cafeLevelList) {
+                if (!cafeLevel.getAutoLevel()) continue;
+
+                CafeLevel memberCafeLevel = gradeToGradeOrder.get(member.getCafeGrade());
+                if(null==memberCafeLevel) continue;
+                if (memberCafeLevel.getGradeOrder() < cafeLevel.getGradeOrder()
+                        && member.getVisitCount() >= cafeLevel.getLevelVisitCount()
+                        && member.getPostCount() >= cafeLevel.getLevelPostCount()
+                        && member.getCommentCount() >= cafeLevel.getLevelCommentCount()
+                ) { // 조건 만족 & 멤버 현 등급 보다 높으면 등업
+                    member.updateCafeGrade(cafeLevel.getGrade());
+                    membersToUpgradeList.add(member);
+                    break;
+                }
+            }
+        }
+        if(!membersToUpgradeList.isEmpty()){
+            cafeMemberRepository.saveAll(membersToUpgradeList);
+        }
     }
 }
