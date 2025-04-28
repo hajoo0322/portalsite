@@ -19,7 +19,7 @@ public class LikeController {
             @PathVariable Long membersId
     ) {
         likeService.doLike(cafePostId, membersId);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build(); // ok 보단 created 가맞지않나?
     }
 
     @GetMapping("/cafePosts/{cafePostId}")
@@ -35,6 +35,6 @@ public class LikeController {
             @PathVariable Long likeId
     ) {
         likeService.undoLike(likeId);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build(); // 여기도 no content
     }
 }

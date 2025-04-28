@@ -17,11 +17,11 @@ public class CafeMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cafe_id",nullable = false)
     private Cafe cafe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
@@ -60,5 +60,9 @@ public class CafeMember extends BaseEntity {
 
     public void delete(boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public void updateCafeGrade(String grade) {
+
     }
 }

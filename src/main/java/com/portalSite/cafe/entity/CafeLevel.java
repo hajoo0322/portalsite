@@ -15,7 +15,7 @@ public class CafeLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cafe_id",nullable = false)
     private Cafe cafe;
 

@@ -35,6 +35,7 @@ public class NewsCategoryService {
 
   @Transactional(readOnly = true)
   public List<NewsCategory> getSubCategoriesByParentId(Long categoryId) {
+
     return newsCategoryRepository.findAllByParentId(categoryId);
   }
 

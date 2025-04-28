@@ -28,7 +28,6 @@ public class NewsCategoryController {
   private final NewsCategoryService newsCategoryService;
 
   @PostMapping()
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<NewsCategoryResponse> createCategory(
       @Valid @RequestBody NewsCategoryRequest request
   ) {
@@ -39,7 +38,6 @@ public class NewsCategoryController {
   }
 
   @GetMapping("/{categoryId}/subcategories")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<NewsCategoryResponse>> getSubCategoriesByParentId(
       @PathVariable Long categoryId
   ) {

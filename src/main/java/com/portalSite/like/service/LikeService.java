@@ -26,7 +26,7 @@ public class LikeService {
         CafeMember foundCafeMember = cafeMemberRepository.findById(cafeMemberId)
                 .orElseThrow(() -> new RuntimeException(""));
         Like like = Like.of(foundCafePost, foundCafeMember);
-        likeRepository.save(like);
+        likeRepository.save(like); // 한명이 하나의 포스에 하나만 좋아요 누르는 로직필요
     }
 
     @Transactional(readOnly = true)
