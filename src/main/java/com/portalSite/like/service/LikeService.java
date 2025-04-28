@@ -23,7 +23,7 @@ public class LikeService {
     public void doLike(Long cafeId, Long cafePostId, Long cafeMemberId) {
         CafePost foundCafePost = cafePostRepository.findById(cafePostId)
                 .orElseThrow(() -> new RuntimeException(""));
-        CafeMember foundCafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, cafeMemberId)
+        CafeMember foundCafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, cafeMemberId)
                 .orElseThrow(() -> new RuntimeException(""));
         Like like = Like.of(foundCafePost, foundCafeMember);
         likeRepository.save(like);
