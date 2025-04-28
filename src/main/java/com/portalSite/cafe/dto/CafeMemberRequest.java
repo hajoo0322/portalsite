@@ -7,7 +7,6 @@ public record CafeMemberRequest(
         @NotNull(message = "닉네임은 비어있을수 없습니다.")
         @Size(max = 12)
         String nickname
-
 ) {
 
 }

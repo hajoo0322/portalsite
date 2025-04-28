@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/blogs/{blogId}/category")
+@RequestMapping("api/blogs/{blogId}/categories")
 @RequiredArgsConstructor
 public class BlogBoardController {
 

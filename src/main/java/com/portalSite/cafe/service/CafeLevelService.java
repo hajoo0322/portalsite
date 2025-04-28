@@ -25,7 +25,8 @@ public class CafeLevelService {
     public List<CafeLevelResponse> addCafeLevel(CafeLevelRequestList cafeLevelRequest, Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         List<CafeLevel> cafeLevelList = cafeLevelRequest.cafeLevelRequestList().stream()
-                .map(req -> CafeLevel.of(cafe, req.grade(), req.description(), req.autoLevel(), req.gradeOrder())).toList();
+                .map(req -> CafeLevel.of(cafe, req.grade(), req.description(), req.autoLevel(), req.gradeOrder(),
+                        req.visitCount(), req.commentCount(), req.postCount())).toList();
         List<CafeLevel> savedCafeLevelList = cafeLevelRepository.saveAll(cafeLevelList);
 
         return savedCafeLevelList.stream().map(CafeLevelResponse::from).toList();
@@ -56,11 +57,14 @@ public class CafeLevelService {
 
             CafeLevel target = cafeLevelMap.get(levelRequest.gradeOrder());
             if (target != null) {
-                target.update(levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel());
+                target.update(levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel(),
+                        levelRequest.visitCount(), levelRequest.commentCount(), levelRequest.postCount());
                 levelsToSave.add(target);
             } else {
                 CafeLevel cafeLevel = CafeLevel
-                        .of(cafe, levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel(), levelRequest.gradeOrder());
+                        .of(cafe, levelRequest.grade(), levelRequest.description(), levelRequest.autoLevel(),
+                                levelRequest.gradeOrder(), levelRequest.visitCount(), levelRequest.commentCount(),
+                                levelRequest.postCount());
                 levelsToSave.add(cafeLevel);
             }
         }

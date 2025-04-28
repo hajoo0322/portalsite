@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/member/{memberId}/blog/{blogId}/category/{blogBoardId}")
+@RequestMapping("api/members/{memberId}/blogs/{blogId}/categories/{blogBoardId}/posts")
 @RequiredArgsConstructor
 public class BlogPostController {
 
@@ -34,15 +34,21 @@ public class BlogPostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<BlogPostResponse>> getAllBlogPost(@PathVariable Long blogId) {
+//        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogId(blogId);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+
     @GetMapping
     public ResponseEntity<List<BlogPostResponse>> getAllBlogPostByBlogBoardId(@PathVariable Long blogBoardId) {
-        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogId(blogBoardId);
+        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogBoardId(blogBoardId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{blogPostId}")
-    public ResponseEntity<List<BlogPostResponse>> getBlogPost(@PathVariable Long blogId) {
-        List<BlogPostResponse> response = blogPostService.getAllBlogPostByBlogBoardId(blogId);
+    public ResponseEntity<BlogPostResponse> getBlogPost(@PathVariable Long blogPostId) {
+        BlogPostResponse response = blogPostService.getBlogPostById(blogPostId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

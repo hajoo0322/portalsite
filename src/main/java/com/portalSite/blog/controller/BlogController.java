@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/member/{memberId}/blog") //인증인가 없어서 일단 일케 해놓음
+@RequestMapping("api/members/{memberId}/blogs") //인증인가 없어서 일단 일케 해놓음
 public class BlogController {
 
     private final BlogService blogService;
