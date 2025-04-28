@@ -3,10 +3,12 @@ package com.portalSite.cafe.controller;
 import com.portalSite.cafe.dto.CafeMemberRequest;
 import com.portalSite.cafe.dto.CafeMemberResponse;
 import com.portalSite.cafe.service.CafeMemberService;
+import com.portalSite.security.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +20,21 @@ public class CafeMemberController {
 
     private final CafeMemberService cafeMemberService;
 
-    @PostMapping("/members/{memberId}")
-    public ResponseEntity<CafeMemberResponse> addCafeMember(@RequestBody @Valid CafeMemberRequest cafeMemberRequest, @PathVariable Long memberId,@PathVariable Long cafeId) {
-        CafeMemberResponse cafeMemberResponse = cafeMemberService.addCafeMember(cafeMemberRequest, memberId,cafeId);
+    @PostMapping
+    public ResponseEntity<CafeMemberResponse> addCafeMember(
+            @RequestBody @Valid CafeMemberRequest cafeMemberRequest,
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long cafeId) {
+        CafeMemberResponse cafeMemberResponse = cafeMemberService.addCafeMember(cafeMemberRequest, authUser.memberId(),cafeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(cafeMemberResponse);
     }
 
-    @GetMapping("/members/{memberId}")
-    public ResponseEntity<CafeMemberResponse> getCafeMember(@PathVariable Long memberId,@PathVariable Long cafeId) {
-        CafeMemberResponse cafeMemberResponse = cafeMemberService.getCafeMember(memberId,cafeId);
+    @GetMapping
+    public ResponseEntity<CafeMemberResponse> getCafeMember(
+            @PathVariable Long cafeId,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        CafeMemberResponse cafeMemberResponse = cafeMemberService.getCafeMember(authUser.memberId(), cafeId);
         return ResponseEntity.status(HttpStatus.OK).body(cafeMemberResponse);
     }
 
@@ -36,15 +44,20 @@ public class CafeMemberController {
         return ResponseEntity.status(HttpStatus.OK).body(cafeMemberResponseList);
     }
 
-    @PatchMapping("/members/{memberId}")
-    public ResponseEntity<CafeMemberResponse> updateCafeMember(@RequestBody @Valid CafeMemberRequest cafeMemberRequest, @PathVariable Long memberId,@PathVariable Long cafeId) {
-        CafeMemberResponse cafeMemberResponse = cafeMemberService.updateCafeMember(cafeMemberRequest, memberId, cafeId);
+    @PatchMapping
+    public ResponseEntity<CafeMemberResponse> updateCafeMember(
+            @RequestBody @Valid CafeMemberRequest cafeMemberRequest,
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long cafeId) {
+        CafeMemberResponse cafeMemberResponse = cafeMemberService.updateCafeMember(cafeMemberRequest, authUser.memberId(), cafeId);
         return ResponseEntity.status(HttpStatus.OK).body(cafeMemberResponse);
     }
 
     @DeleteMapping("/members/{memberId}")
-    public ResponseEntity<Void> deleteCafeMember(@PathVariable Long memberId,@PathVariable Long cafeId) {
-        cafeMemberService.deleteCafeMember(memberId,cafeId);
+    public ResponseEntity<Void> deleteCafeMember(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long cafeId) {
+        cafeMemberService.deleteCafeMember(authUser.memberId(), cafeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
