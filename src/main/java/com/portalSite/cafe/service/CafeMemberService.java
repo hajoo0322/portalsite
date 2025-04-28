@@ -67,8 +67,6 @@ public class CafeMemberService {
     @Transactional
     public void upgradeOneCafeMemberGrade(Cafe cafe) {
         List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeIdOrderByGradeOrderDesc(cafe.getId());
-        Map<String, CafeLevel> gradeToGradeOrder = cafeLevelList.stream().collect(Collectors.toMap(CafeLevel::getGrade, Function.identity()));
-
         List<CafeMember> cafeMemberList = cafeMemberRepository.findAllByCafeId(cafe.getId());
         List<CafeMember> membersToUpgradeList = new ArrayList<>();
 
@@ -80,16 +78,16 @@ public class CafeMemberService {
                     continue;
                 }
 
-                CafeLevel memberCafeLevel = gradeToGradeOrder.get(member.getCafeGrade());
+                Integer memberCafeLevel = member.getCafeLevel().getGradeOrder();
                 if(null==memberCafeLevel) {
                     throw new RuntimeException(); /*TODO 예외: 존재하지 않는 등급*/
                 }
-                if (memberCafeLevel.getGradeOrder() < cafeLevel.getGradeOrder()
+                if (memberCafeLevel < cafeLevel.getGradeOrder()
                         && member.getVisitCount() >= cafeLevel.getLevelVisitCount()
                         && member.getPostCount() >= cafeLevel.getLevelPostCount()
                         && member.getCommentCount() >= cafeLevel.getLevelCommentCount()
                 ) { // 조건 만족 & 멤버 현 등급 보다 높으면 등업
-                    member.updateCafeGrade(cafeLevel.getGrade());
+                    member.updateCafeGrade(cafeLevel);
                     membersToUpgradeList.add(member);
                     break;
                 }
