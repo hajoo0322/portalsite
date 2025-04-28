@@ -4,10 +4,11 @@ package com.portalSite.blog.dto.response;
 import com.portalSite.blog.entity.Blog;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlogResponse {
-
 
     private final Long id;
     private final Long memberId;

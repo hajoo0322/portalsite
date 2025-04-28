@@ -16,6 +16,7 @@ import com.portalSite.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,18 @@ public class BlogPostService {
     private final MemberRepository memberRepository;
 
 
-    public BlogPostResponse saveBlogPost(CreateBlogPostRequest request, Long blogId, Long blogBoardId, Long memberId) {
+    public BlogPostResponse saveBlogPost(CreateBlogPostRequest request, Long blogId,
+        Long blogBoardId, Long memberId) {
 
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
-        BlogBoard blogBoard = blogBoardRepository.findById(blogBoardId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
-        Member blogMember = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+        Blog blog = blogRepository.findById(blogId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
+        BlogBoard blogBoard = blogBoardRepository.findById(blogBoardId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
+        Member blogMember = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
-        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.getTitle(), request.getDescription());
+        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.getTitle(),
+            request.getDescription());
 
         BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
@@ -61,18 +67,30 @@ public class BlogPostService {
         return blogPostList.stream().map(BlogPostResponse::from).toList();
     }
 
-    public BlogPostResponse updateBlogPost(UpdateBlogPostRequest request, Long blogPostId) {
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
-        BlogBoard blogBoard = blogBoardRepository.findById(request.getBlogBoardId()).orElseThrow(()-> new RuntimeException("존제하지 않는 게시판입니."));
+    @Transactional(readOnly = true)
+    public BlogPostResponse getBlogPostById(Long blogPostId) {
+        BlogPost blogPost = blogPostRepository.findById(blogPostId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+        return BlogPostResponse.from(blogPost);
+    }
 
-        blogPost.update(blogBoard, request.getTitle(),request.getDescription());
+    public BlogPostResponse updateBlogPost(UpdateBlogPostRequest request, Long blogPostId) {
+        BlogPost blogPost = blogPostRepository.findById(blogPostId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
+
+        BlogBoard blogBoard = Optional.ofNullable(request.getBlogBoardId())
+            .flatMap(blogBoardRepository::findById)
+            .orElse(null);
+
+        blogPost.update(blogBoard, request.getTitle(), request.getDescription());
 
         BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
     }
 
     public void deleteBlogPost(Long blogPostId) {
-        BlogPost blogPost = blogPostRepository.findById(blogPostId).orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
+        BlogPost blogPost = blogPostRepository.findById(blogPostId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
         blogPostRepository.delete(blogPost);
     }
 
@@ -90,14 +108,15 @@ public class BlogPostService {
         }
         hashtagRepository.saveAll(newTags);
 
+        List<Hashtag> allTags = hashtagRepository.findByTagIn(hashtags);
+        Map<String, Hashtag> tagMap = allTags.stream()
+            .collect(Collectors.toMap(Hashtag::getTag, Function.identity()));
+
         for (String tag : hashtags) {
-            Hashtag hashtag = existingTagMap.getOrDefault(
-                tag,
-                newTags.stream()
-                    .filter(t -> t.getTag().equals(tag))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("해시태그 연결 실패"))
-            );
+            Hashtag hashtag = tagMap.get(tag);
+            if (hashtag == null) {
+                throw new RuntimeException("해시태그 연결 실패");
+            }
             blogPost.addHashtag(hashtag);
         }
 
