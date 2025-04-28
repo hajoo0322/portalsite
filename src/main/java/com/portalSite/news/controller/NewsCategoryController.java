@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/*TODO 관리자만 작성 가능하도록 모든 메서드에 대해 권한 추가*/
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/news/categories")
@@ -28,6 +28,7 @@ public class NewsCategoryController {
   private final NewsCategoryService newsCategoryService;
 
   @PostMapping()
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<NewsCategoryResponse> createCategory(
       @Valid @RequestBody NewsCategoryRequest request
   ) {
@@ -38,6 +39,7 @@ public class NewsCategoryController {
   }
 
   @GetMapping("/{categoryId}/subcategories")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<NewsCategoryResponse>> getSubCategoriesByParentId(
       @PathVariable Long categoryId
   ) {
@@ -50,6 +52,7 @@ public class NewsCategoryController {
   }
 
   @PatchMapping("/{categoryId}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<NewsCategoryResponse> updateCategory(
     @RequestBody NewsCategoryRequest request,
     @PathVariable Long categoryId
@@ -60,6 +63,7 @@ public class NewsCategoryController {
   }
 
   @DeleteMapping("/{categoryId}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Null> deleteCategory(
       @PathVariable Long categoryId
   ){

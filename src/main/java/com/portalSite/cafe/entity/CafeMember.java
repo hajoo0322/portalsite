@@ -37,6 +37,12 @@ public class CafeMember extends BaseEntity {
     @Column(name = "is_deleted",nullable = false)
     private boolean isDeleted;
 
+    @Column(name = "post_count", nullable = false)
+    private int postCount;
+
+    @Column(name = "comment_count",nullable = false)
+    private int commentCount;
+
     private CafeMember(Cafe cafe, Member member, String cafeGrade, String nickname) {
         this.cafe = cafe;
         this.member = member;

@@ -3,12 +3,17 @@ package com.portalSite.news.controller;
 import com.portalSite.news.dto.request.*;
 import com.portalSite.news.dto.response.*;
 import com.portalSite.news.service.NewsService;
+import com.portalSite.security.AuthUser;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Null;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,54 +28,59 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/news")
 public class NewsController {
 
-  private final NewsService newsService;
+    private final NewsService newsService;
 
-  /*TODO 기자만 작성 가능하도록 권한 추가*/
-  @PostMapping()
-  public ResponseEntity<NewsResponse> createNews(
-      @Valid @RequestBody NewsCreateRequest requestDto
-  ) {
-    Long memberId = 0L; /*TODO JWT 구현 후 추가*/
-    NewsResponse responseDto = NewsResponse.from(
-        newsService.createNews(requestDto, memberId));
+    @PostMapping()
+    @PreAuthorize("hasRole('REPORTER')")
+    public ResponseEntity<NewsResponse> createNews(
+            @Valid @RequestBody NewsCreateRequest requestDto,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        Long memberId = authUser.memberId();
+        NewsResponse responseDto = NewsResponse.from(
+                newsService.createNews(requestDto, memberId));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-  }
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
 
-  @GetMapping("/{newsId}")
-  public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long newsId) {
-    NewsResponse responseDto = NewsResponse.from(newsService.getNewsById(newsId));
+    @GetMapping("/{newsId}")
+    public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long newsId) {
+        NewsResponse responseDto = NewsResponse.from(newsService.getNewsById(newsId));
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
-  @GetMapping("/categories/{categoryId}")
-  public ResponseEntity<List<NewsResponse>> getNewsListByCategory(
-      @PathVariable Long categoryId
-  ){
-    List<NewsResponse> responseDtoList = newsService.getNewsListByCategory(categoryId).stream()
-        .map(NewsResponse::from)
-        .toList();
+    @GetMapping("/categories/{categoryId}")
+    public ResponseEntity<List<NewsResponse>> getNewsListByCategory(
+            @PathVariable Long categoryId
+    ) {
+        List<NewsResponse> responseDtoList = newsService.getNewsListByCategory(categoryId).stream()
+                .map(NewsResponse::from)
+                .toList();
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+    }
 
-  @PatchMapping("/{newsId}")
-  public ResponseEntity<NewsResponse> updateNews(
-    @PathVariable Long newsId,
-    @RequestBody NewsRequest requestDto
-  ) {
-    Long memberId = 0L; /*TODO JWT 구현 후 추가*/
-    NewsResponse responseDto = NewsResponse.from(newsService.updateNews(requestDto, newsId, memberId));
+    @PatchMapping("/{newsId}")
+    public ResponseEntity<NewsResponse> updateNews(
+            @PathVariable Long newsId,
+            @RequestBody NewsRequest requestDto,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        Long memberId = authUser.memberId();
+        NewsResponse responseDto = NewsResponse.from(newsService.updateNews(requestDto, newsId, memberId));
 
-    return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
-  @DeleteMapping("/{newsId}")
-  public ResponseEntity<Null> deleteNews(@PathVariable Long newsId){
-    Long memberId = 0L; /*TODO JWT 구현 후 추가*/
-    newsService.deleteNews(newsId, memberId);
+    @DeleteMapping("/{newsId}")
+    public ResponseEntity<Null> deleteNews(
+            @PathVariable Long newsId,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        Long memberId = authUser.memberId();
+        newsService.deleteNews(newsId, memberId);
 
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-  }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 }

@@ -12,6 +12,9 @@ public record CafeLevelRequest(
         @NotNull(message = "등급 순서는 비어있을수없습니다.")
         @Min(value = 1, message = "등급 순서는 1보다 작을수없습니다.")
         @Max(value = 6, message = "등급 순서는 6을 넘을수 없습니다.")
-        Integer gradeOrder
+        Integer gradeOrder,
+        int levelPostCount,
+        int levelCommentCount,
+        int levelVisitCount
 ) {
 }

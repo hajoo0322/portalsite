@@ -40,7 +40,7 @@ public class CafeMemberService {
 
     @Transactional(readOnly = true)
     public CafeMemberResponse getCafeMember(Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         return CafeMemberResponse.from(cafeMember);
     }
 
@@ -55,7 +55,7 @@ public class CafeMemberService {
 
     @Transactional
     public CafeMemberResponse updateCafeMember(CafeMemberRequest cafeMemberRequest, Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         cafeMember.update(cafeMemberRequest);
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
         return CafeMemberResponse.from(savedCafeMember);
@@ -63,7 +63,7 @@ public class CafeMemberService {
 
     @Transactional
     public void deleteCafeMember(Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         cafeMember.delete(true);
     }
 
