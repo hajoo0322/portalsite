@@ -79,10 +79,14 @@ public class CafeMemberService {
         for (CafeMember member : cafeMemberList) {
             // 등급별 조건 검사
             for (CafeLevel cafeLevel : cafeLevelList) {
-                if (!cafeLevel.getAutoLevel()) continue;
+                if (!cafeLevel.getAutoLevel()) {
+                    continue;
+                }
 
                 CafeLevel memberCafeLevel = gradeToGradeOrder.get(member.getCafeGrade());
-                if(null==memberCafeLevel) continue;
+                if(null==memberCafeLevel) {
+                    throw new RuntimeException(); /*TODO 예외: 존재하지 않는 등급*/
+                }
                 if (memberCafeLevel.getGradeOrder() < cafeLevel.getGradeOrder()
                         && member.getVisitCount() >= cafeLevel.getLevelVisitCount()
                         && member.getPostCount() >= cafeLevel.getLevelPostCount()
