@@ -37,7 +37,7 @@ public class CafeMember extends BaseEntity {
     @Column(name = "is_deleted",nullable = false)
     private boolean isDeleted;
 
-    @Column(name = "post_count", nullable = false)
+    @Column(name = "post_count",nullable = false)
     private int postCount;
 
     @Column(name = "comment_count",nullable = false)
@@ -48,6 +48,9 @@ public class CafeMember extends BaseEntity {
         this.member = member;
         this.cafeGrade = cafeGrade;
         this.nickname = nickname;
+        this.visitCount=0;
+        this.commentCount=0;
+        this.postCount=0;
     }
 
     public static CafeMember of(Cafe cafe, Member member, String cafeGrade, String nickname) {
@@ -56,6 +59,10 @@ public class CafeMember extends BaseEntity {
 
     public void update(CafeMemberRequest cafeMemberRequest) {
         this.nickname = cafeMemberRequest.nickname();
+    }
+
+    public void updateCafeGrade(String cafeGrade) {
+        this.cafeGrade=cafeGrade;
     }
 
     public void delete(boolean isDeleted) {
