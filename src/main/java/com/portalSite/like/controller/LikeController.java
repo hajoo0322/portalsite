@@ -37,6 +37,6 @@ public class LikeController {
             @PathVariable Long likeId
     ) {
         likeService.undoLike(likeId);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build(); // 여기도 no content
     }
 }

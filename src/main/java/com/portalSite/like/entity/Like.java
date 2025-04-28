@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "like")
+@Table(name = "post_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like {
     @Id
@@ -21,11 +21,11 @@ public class Like {
     private Long id;
 
     @ManyToOne
-    @Column(name = "cafe_post_id", nullable = false)
+    @JoinColumn(name = "cafe_post_id", nullable = false)
     private CafePost cafePost;
 
     @ManyToOne
-    @Column(name = "cafe_member_id", nullable = false)
+    @JoinColumn(name = "cafe_member_id", nullable = false)
     private CafeMember cafeMember;
 
     @CreatedDate
@@ -41,4 +41,5 @@ public class Like {
     public static Like of(CafePost cafePost, CafeMember cafeMember) {
         return new Like(cafePost, cafeMember, LocalDateTime.now());
     }
+    // createDate를 썻는데 로컬데이트타임 나우 메서드는 필요없징 크리에이트데이트 쓰려면 클래스에 앤티티리스너있어야함
 }

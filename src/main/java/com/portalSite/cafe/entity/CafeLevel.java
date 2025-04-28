@@ -1,7 +1,7 @@
 package com.portalSite.cafe.entity;
 
 import jakarta.persistence.*;
-        import lombok.AccessLevel;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +15,7 @@ public class CafeLevel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cafe_id", nullable = false)
     private Cafe cafe;
 
