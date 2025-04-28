@@ -38,15 +38,21 @@ public class BlogBoardService {
         return blogBoardList.stream().map(BlogBoardResponse::from).toList();
     }
 
-    public BlogBoardResponse updateBlogBoard(UpdateBlogBoardRequest request, Long categoryId) {
+    public BlogBoardResponse updateBlogBoard(UpdateBlogBoardRequest request, Long categoryId, Long memberId) {
+
         BlogBoard blogBoard = blogBoardRepository.findById(categoryId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
+
+        if (memberId.equals(blogBoard.getBlog().getMember().getId())) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
         blogBoard.update(request.getCategory());
 
         return BlogBoardResponse.from(blogBoardRepository.save(blogBoard));
     }
 
     public void deleteBlogBoard(Long categoryId, Long memberId) {
+
         BlogBoard blogBoard = blogBoardRepository.findById(categoryId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
 

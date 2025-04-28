@@ -21,6 +21,7 @@ public class BlogService {
     private final MemberRepository memberRepository;
 
     public BlogResponse saveBlog(CreateBlogRequest request, Long memberId){
+
         Member member = memberRepository.findById(memberId).orElseThrow(()->new RuntimeException("존재하지 않는 유저입니다."));
         Blog blog = Blog.of(member, request.getName(),request.getDescription());
 
@@ -39,14 +40,22 @@ public class BlogService {
         return BlogResponse.from(blog);
     }
 
-    public BlogResponse updateBlog(UpdateBlogRequest request, Long blogId) {
+    public BlogResponse updateBlog(UpdateBlogRequest request, Long blogId, Long memberId) {
+
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
+        if (!memberId.equals(blog.getMember().getId())) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
         blog.update(request.getName(), request.getDescription());
         return BlogResponse.from(blog);
     }
 
-    public void deleteBlog(Long blogId) {
+    public void deleteBlog(Long blogId, Long memberId) {
+
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
+        if (memberId.equals(blog.getMember().getId())) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
         blogRepository.delete(blog);
     }
 }

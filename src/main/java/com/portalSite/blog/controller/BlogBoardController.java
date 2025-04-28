@@ -36,8 +36,10 @@ public class BlogBoardController {
     }
 
     @PatchMapping("/{blogBoardId}")
-    public ResponseEntity<BlogBoardResponse> updateBlogBoard(@RequestBody @Valid UpdateBlogBoardRequest request, @PathVariable Long blogBoardId) {
-        BlogBoardResponse response = blogBoardService.updateBlogBoard(request, blogBoardId);
+    public ResponseEntity<BlogBoardResponse> updateBlogBoard(   @RequestBody @Valid UpdateBlogBoardRequest request,
+                                                                @PathVariable Long blogBoardId,
+                                                                @AuthenticationPrincipal AuthUser member) {
+        BlogBoardResponse response = blogBoardService.updateBlogBoard(request, blogBoardId, member.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

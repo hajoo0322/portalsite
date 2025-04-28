@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "blog")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Blog extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,8 +48,8 @@ public class Blog extends BaseEntity {
     }
 
     public void update(String blogName, String description) {
-        this.blogName = blogName;
-        this.description = description;
+        this.blogName = blogName == null ? this.blogName : blogName;
+        this.description = description == null ? this.description : description;
     }
 
 }
