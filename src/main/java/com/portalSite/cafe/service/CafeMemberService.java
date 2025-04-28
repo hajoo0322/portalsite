@@ -34,7 +34,7 @@ public class CafeMemberService {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new RuntimeException(""));
-        CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel.getGrade(), cafeMemberRequest.nickname());
+        CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel, cafeMemberRequest.nickname());
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
         return CafeMemberResponse.from(savedCafeMember);
     }
@@ -100,7 +100,11 @@ public class CafeMemberService {
         }
     }
 
-    public CafeMemberResponse addFirstCafeMember(Long aLong) {
+    public CafeMemberResponse addFirstCafeMember(Long memberId, Long cafeId, CafeMemberRequest cafeMemberRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember.of(cafe, member,cafeLevel, cafeMemberRequest.nickname());
         return null;
     }
 }

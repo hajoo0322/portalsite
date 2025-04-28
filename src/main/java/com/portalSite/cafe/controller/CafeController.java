@@ -1,9 +1,6 @@
 package com.portalSite.cafe.controller;
 
-import com.portalSite.cafe.dto.CafeAndCafeMemberResponse;
-import com.portalSite.cafe.dto.CafeMemberResponse;
-import com.portalSite.cafe.dto.CafeRequest;
-import com.portalSite.cafe.dto.CafeResponse;
+import com.portalSite.cafe.dto.*;
 import com.portalSite.cafe.service.CafeMemberService;
 import com.portalSite.cafe.service.CafeService;
 import com.portalSite.security.AuthUser;
@@ -24,10 +21,10 @@ public class CafeController {
 
     @PostMapping
     public ResponseEntity<CafeAndCafeMemberResponse> addCafe(
-            @RequestBody @Valid CafeRequest requestCafe,
+            @RequestBody @Valid CafeAndCafeMemberRequest cafeAndCafeMemberRequest,
             @AuthenticationPrincipal AuthUser authUser) {
-        CafeResponse cafeResponse = cafeService.addCafe(requestCafe);
-        CafeMemberResponse cafeMemberResponse = cafeMemberService.addFirstCafeMember(authUser.memberId());
+        CafeResponse cafeResponse = cafeService.addCafe(cafeAndCafeMemberRequest.cafeRequest());
+        CafeMemberResponse cafeMemberResponse = cafeMemberService.addFirstCafeMember(authUser.memberId(),cafeResponse.id(),cafeAndCafeMemberRequest.cafeMemberRequest());
         return ResponseEntity.status(HttpStatus.CREATED).body(CafeAndCafeMemberResponse.from(cafeResponse,cafeMemberResponse));
     }
 

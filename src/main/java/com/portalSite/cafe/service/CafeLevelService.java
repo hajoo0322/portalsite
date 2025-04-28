@@ -34,7 +34,7 @@ public class CafeLevelService {
 
     @Transactional(readOnly = true)
     public List<CafeLevelResponse> getCafeLevel(Long cafeId) {
-        List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeId(cafeId);
+        List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeIdOrderByGradeOrderDesc(cafeId);
         if (cafeLevelList.isEmpty()) {
             throw new RuntimeException("");
         }

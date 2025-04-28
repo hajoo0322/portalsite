@@ -25,8 +25,9 @@ public class CafeMember extends BaseEntity {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-    @Column(name = "cafe_grade",length = 12)
-    private String cafeGrade;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cafe_level",nullable = false)
+    private CafeLevel cafeLevel;
 
     @Column(name = "visit_count",nullable = false)
     private int visitCount;
@@ -43,26 +44,26 @@ public class CafeMember extends BaseEntity {
     @Column(name = "comment_count",nullable = false)
     private int commentCount;
 
-    private CafeMember(Cafe cafe, Member member, String cafeGrade, String nickname) {
+    private CafeMember(Cafe cafe, Member member, CafeLevel cafeLevel, String nickname) {
         this.cafe = cafe;
         this.member = member;
-        this.cafeGrade = cafeGrade;
+        this.cafeLevel = cafeLevel;
         this.nickname = nickname;
         this.visitCount=0;
         this.commentCount=0;
         this.postCount=0;
     }
 
-    public static CafeMember of(Cafe cafe, Member member, String cafeGrade, String nickname) {
-        return new CafeMember(cafe, member, cafeGrade, nickname);
+    public static CafeMember of(Cafe cafe, Member member, CafeLevel cafeLevel, String nickname) {
+        return new CafeMember(cafe, member, cafeLevel, nickname);
     }
 
     public void update(CafeMemberRequest cafeMemberRequest) {
         this.nickname = cafeMemberRequest.nickname();
     }
 
-    public void updateCafeGrade(String cafeGrade) {
-        this.cafeGrade=cafeGrade;
+    public void updateCafeGrade(CafeLevel cafeLevel) {
+        this.cafeLevel = cafeLevel;
     }
 
     public void delete(boolean isDeleted) {
