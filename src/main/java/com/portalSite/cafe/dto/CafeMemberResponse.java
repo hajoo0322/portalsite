@@ -11,6 +11,6 @@ public record CafeMemberResponse(
 
 ) {
     public static CafeMemberResponse from(CafeMember cafeMember) {
-        return new CafeMemberResponse(cafeMember.getId(),cafeMember.getCafe().getId(),cafeMember.getCafeGrade(),cafeMember.getVisitCount(),cafeMember.getNickname());
+        return new CafeMemberResponse(cafeMember.getId(),cafeMember.getCafe().getId(),cafeMember.getCafeLevel().getGrade(),cafeMember.getVisitCount(),cafeMember.getNickname());
     }
 }

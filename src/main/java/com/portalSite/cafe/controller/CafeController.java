@@ -1,12 +1,14 @@
 package com.portalSite.cafe.controller;
 
-import com.portalSite.cafe.dto.CafeRequest;
-import com.portalSite.cafe.dto.CafeResponse;
+import com.portalSite.cafe.dto.*;
+import com.portalSite.cafe.service.CafeMemberService;
 import com.portalSite.cafe.service.CafeService;
+import com.portalSite.security.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,11 +17,15 @@ import org.springframework.web.bind.annotation.*;
 public class CafeController {
 
     private final CafeService cafeService;
+    private final CafeMemberService cafeMemberService;
 
     @PostMapping
-    public ResponseEntity<CafeResponse> addCafe(@RequestBody @Valid CafeRequest requestCafe) {
-        CafeResponse cafeResponse = cafeService.addCafe(requestCafe);
-        return ResponseEntity.status(HttpStatus.CREATED).body(cafeResponse);
+    public ResponseEntity<CafeAndCafeMemberResponse> addCafe(
+            @RequestBody @Valid CafeAndCafeMemberRequest cafeAndCafeMemberRequest,
+            @AuthenticationPrincipal AuthUser authUser) {
+        CafeResponse cafeResponse = cafeService.addCafe(cafeAndCafeMemberRequest.cafeRequest());
+        CafeMemberResponse cafeMemberResponse = cafeMemberService.addFirstCafeMember(authUser.memberId(),cafeResponse.id(),cafeAndCafeMemberRequest.cafeMemberRequest());
+        return ResponseEntity.status(HttpStatus.CREATED).body(CafeAndCafeMemberResponse.from(cafeResponse,cafeMemberResponse));
     }
 
     @GetMapping("/{cafeId}")

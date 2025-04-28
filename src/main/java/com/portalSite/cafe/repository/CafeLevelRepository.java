@@ -12,4 +12,6 @@ public interface CafeLevelRepository extends JpaRepository<CafeLevel, Long> {
     Optional<CafeLevel> findFirstByCafeIdOrderByGradeOrderAsc(Long cafeId);
 
     List<CafeLevel> findAllByCafeIdOrderByGradeOrderDesc(Long cafeId);
+
+    Optional<CafeLevel> findFirstByCafeIdOrderByGradeOrderDesc(Long cafeId);
 }

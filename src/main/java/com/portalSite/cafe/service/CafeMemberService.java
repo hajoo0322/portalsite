@@ -34,8 +34,9 @@ public class CafeMemberService {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new RuntimeException(""));
-        CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel.getGrade(), cafeMemberRequest.nickname());
-        return CafeMemberResponse.from(cafeMember);
+        CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel, cafeMemberRequest.nickname());
+        CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
+        return CafeMemberResponse.from(savedCafeMember);
     }
 
     @Transactional(readOnly = true)
@@ -46,11 +47,7 @@ public class CafeMemberService {
 
     @Transactional(readOnly = true)
     public List<CafeMemberResponse> getAllCafeMember(Long cafeId) {
-        List<CafeMember> cafeMemberList = cafeMemberRepository.findAllByCafeId(cafeId);
-        if (cafeMemberList.isEmpty()) {
-            throw new RuntimeException("");
-        }
-        return cafeMemberList.stream().map(CafeMemberResponse::from).toList();
+        return cafeMemberRepository.findAllByCafeId(cafeId).stream().map(CafeMemberResponse::from).toList();
     }
 
     @Transactional
@@ -101,5 +98,13 @@ public class CafeMemberService {
         if(!membersToUpgradeList.isEmpty()){
             cafeMemberRepository.saveAll(membersToUpgradeList);
         }
+    }
+
+    public CafeMemberResponse addFirstCafeMember(Long memberId, Long cafeId, CafeMemberRequest cafeMemberRequest) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = CafeMember.of(cafe, member, cafeLevel, cafeMemberRequest.nickname());
+        return null;
     }
 }
