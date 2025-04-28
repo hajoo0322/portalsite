@@ -104,7 +104,7 @@ public class CafeMemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new RuntimeException(""));
-        CafeMember.of(cafe, member,cafeLevel, cafeMemberRequest.nickname());
+        CafeMember cafeMember = CafeMember.of(cafe, member, cafeLevel, cafeMemberRequest.nickname());
         return null;
     }
 }
