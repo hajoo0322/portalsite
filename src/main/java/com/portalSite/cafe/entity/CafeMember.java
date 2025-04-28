@@ -68,8 +68,4 @@ public class CafeMember extends BaseEntity {
     public void delete(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-
-    public void updateCafeGrade(String grade) {
-
-    }
 }
