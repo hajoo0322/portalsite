@@ -53,7 +53,7 @@ public class CafeMemberController {
         return ResponseEntity.status(HttpStatus.OK).body(cafeMemberResponse);
     }
 
-    @DeleteMapping("/members/{memberId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteCafeMember(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long cafeId) {

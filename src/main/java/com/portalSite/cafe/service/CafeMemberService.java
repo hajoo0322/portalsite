@@ -99,4 +99,8 @@ public class CafeMemberService {
             cafeMemberRepository.saveAll(membersToUpgradeList);
         }
     }
+
+    public CafeMemberResponse addFirstCafeMember(Long aLong) {
+        return null;
+    }
 }
