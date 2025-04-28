@@ -2,10 +2,13 @@ package com.portalSite.member.controller;
 
 import com.portalSite.member.dto.request.*;
 import com.portalSite.member.dto.response.MemberResponse;
+import com.portalSite.member.entity.MemberRole;
 import com.portalSite.member.service.MemberService;
+import com.portalSite.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,14 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
-
-    @PostMapping
-    public ResponseEntity<MemberResponse> createMember(
-            @RequestBody MemberRequest memberRequest
-    ) {
-        MemberResponse response = memberService.registerMember(memberRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
 
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberResponse> getMember(
@@ -30,52 +25,52 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{memberId}/update/{currentId}")
+    @PatchMapping("/{memberId}/update")
     public ResponseEntity<MemberResponse> updateMember(
             @PathVariable Long memberId,
-            @PathVariable Long currentId,
-            @RequestBody MemberUpdateRequest request
+            @RequestBody MemberUpdateRequest request,
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        MemberResponse response = memberService.updateMember(memberId, currentId, request);
+        MemberResponse response = memberService.updateMember(memberId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{memberId}/change/{currentId}")
+    @PatchMapping("/{memberId}/change")
     public ResponseEntity<MemberResponse> changePassword(
             @PathVariable Long memberId,
-            @PathVariable Long currentId,
-            @RequestBody MemberChangePasswordRequest request
+            @RequestBody MemberChangePasswordRequest request,
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        MemberResponse response = memberService.changePassword(memberId, currentId, request);
+        MemberResponse response = memberService.changePassword(memberId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{memberId}/role/{currentId}")
+    @PatchMapping("/{memberId}/role")
     public ResponseEntity<MemberResponse> changeRole(
             @PathVariable Long memberId,
-            @PathVariable Long currentId,
-            @RequestParam(name = "role") String role
+            @RequestParam(name = "role") MemberRole role,
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        MemberResponse response = memberService.changeMemberRole(memberId, currentId, role);
+        MemberResponse response = memberService.changeMemberRole(memberId, authUser.memberId(), role);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{memberId}/{currentId}")
+    @DeleteMapping("/{memberId}")
     public ResponseEntity<Void> deleteMember(
             @PathVariable Long memberId,
-            @PathVariable Long currentId,
-            @RequestBody MemberDeleteRequest request
+            @RequestBody MemberDeleteRequest request,
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        memberService.softDeleteMember(memberId, currentId, request);
+        memberService.softDeleteMember(memberId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PatchMapping("/{currentId}")
+    @PatchMapping("/restore")
     public ResponseEntity<MemberResponse> restoreMember(
-            @PathVariable Long currentId,
-            @RequestBody MemberRestoreRequest request
+            @RequestBody MemberRestoreRequest request,
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        MemberResponse response = memberService.restoreMember(request, currentId);
+        MemberResponse response = memberService.restoreMember(request, authUser.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

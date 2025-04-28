@@ -20,10 +20,10 @@ public class LikeService {
     private final CafePostRepository cafePostRepository;
 
     @Transactional
-    public void doLike(Long cafePostId, Long cafeMemberId) {
+    public void doLike(Long cafeId, Long cafePostId, Long cafeMemberId) {
         CafePost foundCafePost = cafePostRepository.findById(cafePostId)
                 .orElseThrow(() -> new RuntimeException(""));
-        CafeMember foundCafeMember = cafeMemberRepository.findById(cafeMemberId)
+        CafeMember foundCafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, cafeMemberId)
                 .orElseThrow(() -> new RuntimeException(""));
         Like like = Like.of(foundCafePost, foundCafeMember);
         likeRepository.save(like);

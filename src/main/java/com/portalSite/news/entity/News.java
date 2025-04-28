@@ -2,8 +2,10 @@ package com.portalSite.news.entity;
 
 import com.portalSite.common.BaseEntity;
 
+import com.portalSite.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,11 +28,11 @@ public class News extends BaseEntity {
 	@Column(name = "news_id")
 	private Long id;
 
-	@OneToMany
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "news_category_id")
 	private NewsCategory newsCategory;
 
@@ -49,5 +51,11 @@ public class News extends BaseEntity {
 
 	public static News of(Member member, NewsCategory newsCategory, String newsTitle, String description) {
 		return new News(member, newsCategory, newsTitle, description);
+	}
+
+	public void updateNews(NewsCategory newsCategory, String newsTitle, String description){
+		if(newsCategory!=null) this.newsCategory=newsCategory;
+		if(newsTitle!=null) this.newsTitle=newsTitle;
+		if(description!=null) this.description=description;
 	}
 }

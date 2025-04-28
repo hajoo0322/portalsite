@@ -1,10 +1,11 @@
 package com.portalSite.like.controller;
 
-import com.portalSite.like.entity.Like;
 import com.portalSite.like.service.LikeService;
+import com.portalSite.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,12 +14,13 @@ import org.springframework.web.bind.annotation.*;
 public class LikeController {
     private final LikeService likeService;
 
-    @PostMapping("/cafePosts/{cafePostId}/members/{membersId}")
+    @PostMapping("/cafes/{cafeId}/cafePosts/{cafePostId}")
     public ResponseEntity<Void> addLike(
+            @PathVariable Long cafeId,
             @PathVariable Long cafePostId,
-            @PathVariable Long membersId
-    ) {
-        likeService.doLike(cafePostId, membersId);
+            @AuthenticationPrincipal AuthUser authUser
+            ) {
+        likeService.doLike(cafeId,cafePostId, authUser.memberId());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

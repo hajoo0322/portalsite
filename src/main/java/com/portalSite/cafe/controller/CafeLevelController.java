@@ -1,6 +1,5 @@
 package com.portalSite.cafe.controller;
 
-import com.portalSite.cafe.dto.CafeLevelRequest;
 import com.portalSite.cafe.dto.CafeLevelRequestList;
 import com.portalSite.cafe.dto.CafeLevelResponse;
 import com.portalSite.cafe.service.CafeLevelService;
