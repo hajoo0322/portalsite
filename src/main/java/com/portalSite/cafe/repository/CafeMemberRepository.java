@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CafeMemberRepository extends JpaRepository<CafeMember, Long> {
-    Optional<CafeMember> findByCafeIdAndMemberID(Long cafeId, Long memberId);
+    Optional<CafeMember> findByCafeIdAndMemberId(Long cafeId, Long memberId);
 
     List<CafeMember> findAllByCafeId(Long cafeId);
 

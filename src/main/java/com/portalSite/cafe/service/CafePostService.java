@@ -29,7 +29,7 @@ public class CafePostService {
     public CafePostResponse addCafePost(CafePostRequest cafePostRequest, Long cafeId, Long cafeBoardId, Long memberId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeBoard cafeBoard = cafeBoardRepository.findById(cafeBoardId).orElseThrow(() -> new RuntimeException(""));
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberID(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
         CafePost cafePost = CafePost.of(cafe, cafeBoard, cafeMember, cafePostRequest.title(), cafePostRequest.description());
         CafePost savedCafePost = cafePostRepository.save(cafePost);
         return CafePostResponse.from(savedCafePost);

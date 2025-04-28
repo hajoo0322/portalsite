@@ -31,6 +31,15 @@ public class CafeLevel {
     @Column(name = "grade_order",nullable = false)
     private Integer gradeOrder;
 
+    @Column(name = "level_post_count", nullable = false)
+    private int levelPostCount;
+
+    @Column(name = "level_comment_count", nullable = false)
+    private int levelCommentCount;
+
+    @Column(name = "level_visit_count", nullable = false)
+    private int levelVisitCount;
+
     private CafeLevel(Cafe cafe, String grade, String description, Boolean autoLevel, Integer gradeOrder) {
         this.cafe = cafe;
         this.grade = grade;
