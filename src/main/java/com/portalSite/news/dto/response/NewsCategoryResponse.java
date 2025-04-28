@@ -13,8 +13,8 @@ public record NewsCategoryResponse(
     return new NewsCategoryResponse(
         newsCategory.getId(),
         newsCategory.getName(),
-        newsCategory.getParent().getId(),
-        newsCategory.getParent().getName()
+        newsCategory.getParent() != null ? newsCategory.getParent().getId() : null,
+        newsCategory.getParent()!= null ? newsCategory.getParent().getName() : null
     );
   }
 }
