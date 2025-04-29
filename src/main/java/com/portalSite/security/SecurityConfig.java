@@ -1,5 +1,6 @@
 package com.portalSite.security;
 
+import com.portalSite.common.websocket.WebSocketFilter;
 import com.portalSite.member.entity.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final WebSocketFilter webSocketFilter;
     private final JwtSecurityProperties jwtSecurityProperties;
     private final CustomAuthEntryPoint customAuthEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -36,6 +38,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(jwtFilter, SecurityContextHolderAwareRequestFilter.class)
+                .addFilterAfter(webSocketFilter, SecurityContextHolderAwareRequestFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .anonymous(AbstractHttpConfigurer::disable)
