@@ -35,7 +35,7 @@
 
     function connect() {
         const token = document.getElementById('tokenInput').value;
-        const socket = new SockJS(`http://localhost:7111/ws?token=${encodeURIComponent(token)}`); // 서버가 /ws 엔드포인트로 소켓 열어둔 경우
+        const socket = new SockJS(`http://localhost:7111/ws?token=${encodeURIComponent(token)}`);
         stompClient = Stomp.over(socket);
 
         stompClient.connect({ Authorization: 'Bearer ' + token }, (frame) => {
@@ -54,7 +54,7 @@
     function sendMessage() {
         const content = document.getElementById('messageInput').value;
         const token = document.getElementById('tokenInput').value;
-        const roomId = 1; // ← 필요에 따라 동적으로 바꿔도 됨
+        const roomId = 1;
 
         if (!content || !token) return;
 

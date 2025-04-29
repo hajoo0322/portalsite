@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ChatbotFaqRepository extends JpaRepository<ChatbotFaq, Long> {
 
+    // n-gram 풀텍스트 인덱스 사용
     @Query(
             value = "SELECT answer " +
                     "FROM chatbot_faq " +

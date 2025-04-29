@@ -1,12 +1,13 @@
 package com.portalSite.common.websocket;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * 웹소켓 세션 관리
+ */
 @Component
-@Slf4j
 public class WebSocketSessionManager {
 
     private final ConcurrentHashMap<Long, CopyOnWriteArraySet<String>> memberSessions = new ConcurrentHashMap<>();

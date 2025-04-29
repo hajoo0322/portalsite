@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.util.Arrays;
 //TODO: 프롬프트 수정 필요
+//OpenAI API LLM
 @Repository
 public class OpenAiHelper implements AiHelper {
 

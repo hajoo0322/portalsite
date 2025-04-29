@@ -27,6 +27,14 @@ public class ChatbotFaqService {
         return chatbotRoom.getId();
     }
 
+    /**
+     * Flow 사용자 질문에 대한 AI 응답 처리
+     * > 사용자 입력값에서 핵심 키워드(명사) 추출 (LLM 호출)
+     * > 키워드를 기반으로 FAQ 에서 관련 answer 조회 (Full-Text Search)
+     * > 조회된 answer 를 자연스럽게 정제 (LLM 호출)
+     * > 결과를 DB에 저장 (질문 + 응답)
+     * > 응답을 WebSocket 으로 전송
+     */
     @Transactional
     public void handleQuestion(Long roomId, Long memberId, FaqQuestionRequest request) {
         ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)

@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+/**
+ * STOMP 사용자 인증 처리 + 세션 추가
+ */
 @Component
 @RequiredArgsConstructor
 public class StompAuthenticationInterceptor implements ChannelInterceptor {

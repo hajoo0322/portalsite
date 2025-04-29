@@ -16,6 +16,7 @@ public class ChatbotFaqController {
 
     private final ChatbotFaqService chatbotFaqService;
 
+    // 챗봇 사용 위한 room 생성 api
     @PostMapping
     public ResponseEntity<Long> createRoom(
             @AuthenticationPrincipal AuthUser authUser
@@ -24,6 +25,7 @@ public class ChatbotFaqController {
         return ResponseEntity.status(HttpStatus.CREATED).body(roomId);
     }
 
+    // 챗봇 메시지 전송 api
     @PostMapping("/{roomId}")
     public ResponseEntity<Void> handleFaqQuestion(
             @PathVariable Long roomId,
