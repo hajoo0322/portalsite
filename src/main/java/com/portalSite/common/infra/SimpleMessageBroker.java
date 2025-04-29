@@ -14,7 +14,7 @@ public class SimpleMessageBroker implements MessageBroker {
 
     @Override
     public void publish(ChatbotAnswerMessage message) {
-        System.out.println("브로커 작동");
+        //TODO: 메시지 브로커 추가
         broadcaster.send(message);
     }
 }

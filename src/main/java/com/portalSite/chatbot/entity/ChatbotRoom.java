@@ -25,9 +25,12 @@ public class ChatbotRoom extends BaseEntity {
 
     private Boolean isClosed = false;
 
+    public static ChatbotRoom of(Long memberId) {
+        return new ChatbotRoom(memberId);
+    }
+
     public void isEqualMember(Long authUserId) {
         if (!Objects.equals(this.memberId, authUserId)) {
-            System.out.println(this.memberId + " z" + authUserId);
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
     }
@@ -36,5 +39,9 @@ public class ChatbotRoom extends BaseEntity {
         if (this.isClosed) {
             throw new CustomException(ErrorCode.CHATROOM_IS_ALREADY_CLOSED);
         }
+    }
+
+    private ChatbotRoom(Long memberId) {
+        this.memberId = memberId;
     }
 }

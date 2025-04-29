@@ -21,6 +21,12 @@ public class ChatbotFaqService {
     private final MessageBroker broker;
     private final AiHelper aiHelper;
 
+    public Long createRoom(Long memberId) {
+        ChatbotRoom chatbotRoom = ChatbotRoom.of(memberId);
+        chatbotRoomRepository.save(chatbotRoom);
+        return chatbotRoom.getId();
+    }
+
     @Transactional
     public void handleQuestion(Long roomId, Long memberId, FaqQuestionRequest request) {
         ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)

@@ -16,6 +16,14 @@ public class ChatbotFaqController {
 
     private final ChatbotFaqService chatbotFaqService;
 
+    @PostMapping
+    public ResponseEntity<Long> createRoom(
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        Long roomId = chatbotFaqService.createRoom(authUser.memberId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(roomId);
+    }
+
     @PostMapping("/{roomId}")
     public ResponseEntity<Void> handleFaqQuestion(
             @PathVariable Long roomId,
