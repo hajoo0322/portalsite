@@ -7,14 +7,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Table(name = "post_like")
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class PostLike {
     @Id
     @Column(name = "like_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,14 +34,12 @@ public class Like {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private Like(CafePost cafePost, CafeMember cafeMember, LocalDateTime createdAt) {
+    private PostLike(CafePost cafePost, CafeMember cafeMember) {
         this.cafePost = cafePost;
         this.cafeMember = cafeMember;
-        this.createdAt = createdAt;
     }
 
-    public static Like of(CafePost cafePost, CafeMember cafeMember) {
-        return new Like(cafePost, cafeMember, LocalDateTime.now());
+    public static PostLike of(CafePost cafePost, CafeMember cafeMember) {
+        return new PostLike(cafePost, cafeMember);
     }
-    // createDate를 썻는데 로컬데이트타임 나우 메서드는 필요없징 크리에이트데이트 쓰려면 클래스에 앤티티리스너있어야함
 }

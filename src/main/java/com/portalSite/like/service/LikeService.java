@@ -4,13 +4,11 @@ import com.portalSite.cafe.entity.CafeMember;
 import com.portalSite.cafe.entity.CafePost;
 import com.portalSite.cafe.repository.CafeMemberRepository;
 import com.portalSite.cafe.repository.CafePostRepository;
-import com.portalSite.like.entity.Like;
+import com.portalSite.like.entity.PostLike;
 import com.portalSite.like.repository.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +23,7 @@ public class LikeService {
                 .orElseThrow(() -> new RuntimeException(""));
         CafeMember foundCafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, cafeMemberId)
                 .orElseThrow(() -> new RuntimeException(""));
-        Like like = Like.of(foundCafePost, foundCafeMember);
+        PostLike like = PostLike.of(foundCafePost, foundCafeMember);
         likeRepository.save(like); // 한명이 하나의 포스에 하나만 좋아요 누르는 로직필요
     }
 
@@ -38,7 +36,7 @@ public class LikeService {
 
     @Transactional
     public void undoLike(Long likeId) {
-        Like foundLike = likeRepository.findById(likeId)
+        PostLike foundLike = likeRepository.findById(likeId)
                 .orElseThrow(() -> new RuntimeException(""));
         likeRepository.delete(foundLike);
     }
