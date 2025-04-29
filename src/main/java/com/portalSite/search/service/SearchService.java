@@ -21,11 +21,13 @@ public class SearchService {
     private final NewsRepository newsRepository;
 
     public SearchResponse search(SearchRequest request) {
-        List<BlogPostResponse> blogPostList = blogPostRepository.findAllByKeyword(request.keyWord()).stream()
+        String keyword = request.keyword();
+
+        List<BlogPostResponse> blogPostList = blogPostRepository.findAllByKeyword(keyword).stream()
                 .map(BlogPostResponse::from).toList();
-        List<CafePostResponse> cafePostList = cafePostRepository.findAllByKeyword(request.keyWord()).stream()
+        List<CafePostResponse> cafePostList = cafePostRepository.findAllByKeyword(keyword).stream()
                 .map(CafePostResponse::from).toList();
-        List<NewsResponse> newsList = newsRepository.findAllByKeyword(request.keyWord()).stream()
+        List<NewsResponse> newsList = newsRepository.findAllByKeyword(keyword).stream()
                 .map(NewsResponse::from).toList();
 
         return SearchResponse.from(blogPostList, cafePostList, newsList);
