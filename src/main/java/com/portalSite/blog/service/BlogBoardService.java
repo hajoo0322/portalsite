@@ -26,7 +26,7 @@ public class BlogBoardService {
         if (!blog.getMember().getId().equals(memberId)) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
-        BlogBoard blogBoard = BlogBoard.of(blog, request.getCategory());
+        BlogBoard blogBoard = BlogBoard.of(blog, request.category());
 
         return BlogBoardResponse.from(blogBoardRepository.save(blogBoard));
     }
@@ -46,7 +46,7 @@ public class BlogBoardService {
         if (memberId.equals(blogBoard.getBlog().getMember().getId())) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
-        blogBoard.update(request.getCategory());
+        blogBoard.update(request.category());
 
         return BlogBoardResponse.from(blogBoardRepository.save(blogBoard));
     }

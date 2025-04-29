@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/blogs/{blogId}/categories/{blogBoardId}/posts")
+@RequestMapping("/blogs/{blogId}/categories/{blogBoardId}/posts")
 @RequiredArgsConstructor
 public class BlogPostController {
 
