@@ -46,10 +46,14 @@ public class BlogPostService {
         Member blogMember = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
-        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.getTitle(),
-            request.getDescription());
+        if (blog.getMember().equals(blogMember)) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
 
-        BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
+        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.title(),
+            request.description());
+
+        BlogPost connectedPost = connectHashtags(blogPost, request.hashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
     }
 
@@ -62,9 +66,11 @@ public class BlogPostService {
 
     @Transactional(readOnly = true)
     public List<BlogPostResponse> getAllBlogPostByBlogBoardId(Long blogboardId) {
-        List<BlogPost> blogPostList = blogPostRepository.findAllByBlogBoardId(blogboardId);
 
-        return blogPostList.stream().map(BlogPostResponse::from).toList();
+        return Optional.of(blogPostRepository.findAllByBlogBoardId(blogboardId))
+            .filter(list -> !list.isEmpty())
+            .orElseThrow(() -> new RuntimeException("게시물이 없습니다."))
+            .stream().map(BlogPostResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -74,23 +80,31 @@ public class BlogPostService {
         return BlogPostResponse.from(blogPost);
     }
 
-    public BlogPostResponse updateBlogPost(UpdateBlogPostRequest request, Long blogPostId) {
+    public BlogPostResponse updateBlogPost(UpdateBlogPostRequest request, Long blogPostId, Long memberId) {
         BlogPost blogPost = blogPostRepository.findById(blogPostId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
 
-        BlogBoard blogBoard = Optional.ofNullable(request.getBlogBoardId())
+        if (blogPost.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
+        BlogBoard blogBoard = Optional.ofNullable(request.blogBoardId())
             .flatMap(blogBoardRepository::findById)
             .orElse(null);
 
-        blogPost.update(blogBoard, request.getTitle(), request.getDescription());
+        blogPost.update(blogBoard, request.title(), request.description());
 
-        BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
+        BlogPost connectedPost = connectHashtags(blogPost, request.hashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
     }
 
-    public void deleteBlogPost(Long blogPostId) {
+    public void deleteBlogPost(Long blogPostId, Long memberId) {
+
         BlogPost blogPost = blogPostRepository.findById(blogPostId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
+
+        if (blogPost.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
         blogPostRepository.delete(blogPost);
     }
 

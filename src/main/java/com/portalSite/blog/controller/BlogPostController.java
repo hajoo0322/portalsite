@@ -5,10 +5,12 @@ import com.portalSite.blog.dto.request.CreateBlogPostRequest;
 import com.portalSite.blog.dto.request.UpdateBlogPostRequest;
 import com.portalSite.blog.dto.response.BlogPostResponse;
 import com.portalSite.blog.service.BlogPostService;
+import com.portalSite.security.AuthUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/members/{memberId}/blogs/{blogId}/categories/{blogBoardId}/posts")
+@RequestMapping("/blogs/{blogId}/categories/{blogBoardId}/posts")
 @RequiredArgsConstructor
 public class BlogPostController {
 
@@ -29,8 +31,8 @@ public class BlogPostController {
     public ResponseEntity<BlogPostResponse> createBlogPost( @RequestBody CreateBlogPostRequest request,
                                                             @PathVariable Long blogId,
                                                             @PathVariable Long blogBoardId,
-                                                            @PathVariable Long memberId) {
-        BlogPostResponse response = blogPostService.saveBlogPost(request, blogId, blogBoardId,memberId);
+                                                            @AuthenticationPrincipal AuthUser member) {
+        BlogPostResponse response = blogPostService.saveBlogPost(request, blogId, blogBoardId,member.memberId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -53,14 +55,17 @@ public class BlogPostController {
     }
 
     @PatchMapping("/{blogPostId}")
-    public ResponseEntity<BlogPostResponse> updateBlogPost(@RequestBody UpdateBlogPostRequest request, @PathVariable Long blogPostId) {
-        BlogPostResponse response = blogPostService.updateBlogPost(request, blogPostId);
+    public ResponseEntity<BlogPostResponse> updateBlogPost( @RequestBody UpdateBlogPostRequest request,
+                                                            @PathVariable Long blogPostId,
+                                                            @AuthenticationPrincipal AuthUser member) {
+        BlogPostResponse response = blogPostService.updateBlogPost(request, blogPostId, member.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{blogPostId}")
-    public ResponseEntity<Void> deleteBlogPost(@PathVariable Long blogPostId) {
-        blogPostService.deleteBlogPost(blogPostId);
+    public ResponseEntity<Void> deleteBlogPost( @PathVariable Long blogPostId,
+                                                @AuthenticationPrincipal AuthUser member) {
+        blogPostService.deleteBlogPost(blogPostId, member.memberId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

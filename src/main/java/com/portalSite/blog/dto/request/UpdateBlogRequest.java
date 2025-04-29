@@ -1,15 +1,18 @@
 package com.portalSite.blog.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UpdateBlogRequest {
-
-    @NotBlank(message = "블로그명은 비워둘 수 없습니다.")
-    private final String name;
-    private final String description;
+public record UpdateBlogRequest(
+    String name,
+    String description
+) {
+    @JsonCreator
+    public UpdateBlogRequest(
+        @JsonProperty("name") String name,
+        @JsonProperty("description") String description
+    ) {
+        this.name = name;
+        this.description = description;
+    }
 }

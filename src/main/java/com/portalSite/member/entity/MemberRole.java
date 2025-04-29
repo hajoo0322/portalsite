@@ -9,7 +9,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum MemberRole {
     USER(Authority.USER),
-    REPORTER(Authority.USER),
+    REPORTER(Authority.REPORTER),
     ADMIN(Authority.ADMIN);
 
     private final String roleName;
@@ -23,6 +23,7 @@ public enum MemberRole {
 
     public static class Authority {
         public static final String USER = "ROLE_USER";
+        public static final String REPORTER = "ROLE_REPORTER";
         public static final String ADMIN = "ROLE_ADMIN";
     }
 }

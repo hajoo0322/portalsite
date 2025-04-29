@@ -20,10 +20,13 @@ public class BlogBoardService {
     private final BlogBoardRepository blogBoardRepository;
     private final BlogRepository blogRepository;
 
-    public BlogBoardResponse saveBlogBoard(CreateBlogBoardRequest request, Long blogId) {
+    public BlogBoardResponse saveBlogBoard(CreateBlogBoardRequest request, Long blogId, Long memberId) {
         Blog blog = blogRepository.findById(blogId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 블로그입니다."));
-        BlogBoard blogBoard = BlogBoard.of(blog, request.getCategory());
+        if (!blog.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
+        BlogBoard blogBoard = BlogBoard.of(blog, request.category());
 
         return BlogBoardResponse.from(blogBoardRepository.save(blogBoard));
     }
@@ -35,17 +38,27 @@ public class BlogBoardService {
         return blogBoardList.stream().map(BlogBoardResponse::from).toList();
     }
 
-    public BlogBoardResponse updateBlogBoard(UpdateBlogBoardRequest request, Long categoryId) {
+    public BlogBoardResponse updateBlogBoard(UpdateBlogBoardRequest request, Long categoryId, Long memberId) {
+
         BlogBoard blogBoard = blogBoardRepository.findById(categoryId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
-        blogBoard.update(request.getCategory());
+
+        if (memberId.equals(blogBoard.getBlog().getMember().getId())) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
+        blogBoard.update(request.category());
 
         return BlogBoardResponse.from(blogBoardRepository.save(blogBoard));
     }
 
-    public void deleteBlogBoard(Long categoryId) {
+    public void deleteBlogBoard(Long categoryId, Long memberId) {
+
         BlogBoard blogBoard = blogBoardRepository.findById(categoryId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
+
+        if (!blogBoard.getBlog().getMember().getId().equals(memberId)) {
+            throw new RuntimeException("다른 사람의 블로그입니다.");
+        }
 
         blogBoardRepository.delete(blogBoard);
     }

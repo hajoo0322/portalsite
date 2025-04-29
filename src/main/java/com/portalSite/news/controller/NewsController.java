@@ -1,17 +1,18 @@
 package com.portalSite.news.controller;
 
+import com.portalSite.member.entity.MemberRole;
 import com.portalSite.news.dto.request.*;
 import com.portalSite.news.dto.response.*;
 import com.portalSite.news.service.NewsService;
 import com.portalSite.security.AuthUser;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
 
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,6 +63,7 @@ public class NewsController {
     }
 
     @PatchMapping("/{newsId}")
+    @Secured(MemberRole.Authority.REPORTER)
     public ResponseEntity<NewsResponse> updateNews(
             @PathVariable Long newsId,
             @RequestBody NewsRequest requestDto,
@@ -74,13 +76,14 @@ public class NewsController {
     }
 
     @DeleteMapping("/{newsId}")
-    public ResponseEntity<Null> deleteNews(
+    @Secured({MemberRole.Authority.REPORTER, MemberRole.Authority.ADMIN})
+    public ResponseEntity<Void> deleteNews(
             @PathVariable Long newsId,
             @AuthenticationPrincipal AuthUser authUser
     ) {
         Long memberId = authUser.memberId();
         newsService.deleteNews(newsId, memberId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

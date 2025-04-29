@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -20,11 +21,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "blog")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Blog extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(name = "blog_name")
@@ -45,8 +48,8 @@ public class Blog extends BaseEntity {
     }
 
     public void update(String blogName, String description) {
-        this.blogName = blogName;
-        this.description = description;
+        this.blogName = blogName == null ? this.blogName : blogName;
+        this.description = description == null ? this.description : description;
     }
 
 }
