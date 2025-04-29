@@ -30,7 +30,6 @@ public class ChatbotAdminService {
         ChatbotFaq faq = chatbotFaqRepository.findById(faqId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHAT_FAQ_NOT_FOUND));
         faq.update(memberId, request);
-        chatbotFaqRepository.save(faq);
         return ChatbotFaqResponse.from(faq);
     }
 
