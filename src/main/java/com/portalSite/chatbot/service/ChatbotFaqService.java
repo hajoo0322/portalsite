@@ -32,6 +32,8 @@ public class ChatbotFaqService {
         System.out.println("AI가 정제한 키워드 : " + keyword);
         //정제된 낱말 키워드를 바탕으로 ChatbotFaq 테이블의 question 컬럼(full-text-index 사용)에서 answer 컬럼 반환
         String rawAnswer = chatbotFaqRepository.findAnswerByFullText(keyword);
+        System.out.println(rawAnswer);
+        //TODO: rawAnswer 가 NULL 일 경우 분기처리 필요함
         //반환된 answer 컬럼의 답변을, AI 로 정제시켜 최종 반환
         String answer = aiHelper.refineAnswer(rawAnswer);
         System.out.println("AI가 정제한 앤서 : " + answer);

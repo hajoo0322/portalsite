@@ -1,31 +1,55 @@
 package com.portalSite.common.websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portalSite.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.converter.DefaultContentTypeResolver;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.simp.config.ChannelRegistration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.socket.config.annotation.*;
+
+import java.util.List;
 
 @Configuration
-@EnableWebSocket
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final WebSocketSessionManager sessionManager;
     private final JwtUtil jwtUtil;
+    private final StompAuthenticationInterceptor stompAuthenticationInterceptor;
 
-    @Bean
-    public WebSocketHandler webSocketHandler() {
-        return new WebSocketHandler(sessionManager, jwtUtil);
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
     }
 
-    //TODO path 수정
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler(), "/ws")
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")  //TODO 개발용
                 .addInterceptors(new WebSocketHandshakeInterceptor(jwtUtil))
-                .setAllowedOrigins("*");
+                .withSockJS();
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompAuthenticationInterceptor);
+    }
+
+    @Override
+    public boolean configureMessageConverters(List<MessageConverter> converters) {
+        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+        resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
+        MappingJackson2MessageConverter jsonConverter = new MappingJackson2MessageConverter();
+        jsonConverter.setObjectMapper(new ObjectMapper());
+        jsonConverter.setContentTypeResolver(resolver);
+        converters.add(jsonConverter);
+        return false;
     }
 }
