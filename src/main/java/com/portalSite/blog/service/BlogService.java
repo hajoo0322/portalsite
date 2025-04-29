@@ -23,7 +23,7 @@ public class BlogService {
     public BlogResponse saveBlog(CreateBlogRequest request, Long memberId){
 
         Member member = memberRepository.findById(memberId).orElseThrow(()->new RuntimeException("존재하지 않는 유저입니다."));
-        Blog blog = Blog.of(member, request.getName(),request.getDescription());
+        Blog blog = Blog.of(member, request.name(),request.description());
 
          return BlogResponse.from(blogRepository.save(blog));
     }
@@ -46,7 +46,7 @@ public class BlogService {
         if (!memberId.equals(blog.getMember().getId())) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
-        blog.update(request.getName(), request.getDescription());
+        blog.update(request.name(), request.description());
         return BlogResponse.from(blog);
     }
 
