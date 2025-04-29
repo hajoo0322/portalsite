@@ -40,8 +40,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole = MemberRole.USER;
 
-    @Column(nullable = false)
-    private boolean isDeleted = false;
+    @Enumerated(EnumType.STRING)
+    private MemberStatus memberStatus = MemberStatus.NORMAL;
 
     private Member(String email, String loginId, String password, String name, String phoneNumber, String nickname, MemberRole memberRole) {
         this.email = email;
@@ -78,10 +78,10 @@ public class Member extends BaseEntity {
     }
 
     public void softDelete () {
-        this.isDeleted = true;
+        this.memberStatus = MemberStatus.DELETED;
     }
 
     public void restore() {
-        this.isDeleted = false;
+        this.memberStatus = MemberStatus.NORMAL;
     }
 }
