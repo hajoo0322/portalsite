@@ -3,7 +3,7 @@ package com.portalSite.blog.dto.response;
 import com.portalSite.blog.entity.BlogPost;
 import lombok.Getter;
 
-@Getter
+
 public record BlogPostResponse(
     Long id,
     Long memberId,

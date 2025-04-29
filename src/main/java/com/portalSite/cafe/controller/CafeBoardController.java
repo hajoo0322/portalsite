@@ -24,6 +24,15 @@ public class CafeBoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cafeBoardResponse);
     }
 
+    @GetMapping("/duplication")
+    public ResponseEntity<Void> duplicateCafeBoard(
+            @PathVariable Long cafeId,
+            @RequestParam String boardName
+    ) {
+        cafeBoardService.duplicateCafeBoard(cafeId,boardName);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping
     public ResponseEntity<List<CafeBoardResponse>> getAllCafeBoard(@PathVariable Long cafeId) {
         List<CafeBoardResponse> cafeBoardList = cafeBoardService.getAllCafeBoard(cafeId);
