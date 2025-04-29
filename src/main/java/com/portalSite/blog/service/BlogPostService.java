@@ -50,10 +50,10 @@ public class BlogPostService {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
 
-        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.getTitle(),
-            request.getDescription());
+        BlogPost blogPost = BlogPost.of(blog, blogBoard, blogMember, request.title(),
+            request.description());
 
-        BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
+        BlogPost connectedPost = connectHashtags(blogPost, request.hashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
     }
 
@@ -66,9 +66,11 @@ public class BlogPostService {
 
     @Transactional(readOnly = true)
     public List<BlogPostResponse> getAllBlogPostByBlogBoardId(Long blogboardId) {
-        List<BlogPost> blogPostList = blogPostRepository.findAllByBlogBoardId(blogboardId);
 
-        return blogPostList.stream().map(BlogPostResponse::from).toList();
+        return Optional.of(blogPostRepository.findAllByBlogBoardId(blogboardId))
+            .filter(list -> !list.isEmpty())
+            .orElseThrow(() -> new RuntimeException("게시물이 없습니다."))
+            .stream().map(BlogPostResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -85,13 +87,13 @@ public class BlogPostService {
         if (blogPost.getMember().getId().equals(memberId)) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
-        BlogBoard blogBoard = Optional.ofNullable(request.getBlogBoardId())
+        BlogBoard blogBoard = Optional.ofNullable(request.blogBoardId())
             .flatMap(blogBoardRepository::findById)
             .orElse(null);
 
-        blogPost.update(blogBoard, request.getTitle(), request.getDescription());
+        blogPost.update(blogBoard, request.title(), request.description());
 
-        BlogPost connectedPost = connectHashtags(blogPost, request.getHashtags());
+        BlogPost connectedPost = connectHashtags(blogPost, request.hashtags());
         return BlogPostResponse.from(blogPostRepository.save(connectedPost));
     }
 

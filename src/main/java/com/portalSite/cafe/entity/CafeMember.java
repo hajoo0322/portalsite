@@ -52,6 +52,7 @@ public class CafeMember extends BaseEntity {
         this.visitCount=0;
         this.commentCount=0;
         this.postCount=0;
+        this.isDeleted=false;
     }
 
     public static CafeMember of(Cafe cafe, Member member, CafeLevel cafeLevel, String nickname) {
