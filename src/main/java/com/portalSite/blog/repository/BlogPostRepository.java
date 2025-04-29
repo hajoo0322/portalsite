@@ -12,6 +12,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost,Long> {
     List<BlogPost> findAllByBlogBoardId(Long blogboardId);
 
     @Query("""
-            """)
+""")
     List<BlogPost> findAllByKeyword(String keyword);
 }
