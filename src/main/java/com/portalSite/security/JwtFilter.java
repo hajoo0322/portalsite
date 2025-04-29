@@ -1,10 +1,9 @@
 package com.portalSite.security;
 
+import com.portalSite.common.exception.core.ErrorResponseHandler;
 import com.portalSite.member.entity.MemberRole;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -25,6 +25,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtSecurityProperties jwtSecurityProperties;
+    private final ErrorResponseHandler errorResponseHandler;
     private final JwtUtil jwtUtil;
 
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
@@ -51,24 +52,25 @@ public class JwtFilter extends OncePerRequestFilter {
                     setAuthentication(token);
                 }
             } catch (ExpiredJwtException e) {
-                log.error("만료된 JWT 토큰입니다.");
-                //TODO exception
+                errorResponseHandler.send(response, HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+                return;
+            } catch (SignatureException e) {
+                errorResponseHandler.send(response, HttpStatus.UNAUTHORIZED, "유효하지 않은 JWT 서명입니다.");
                 return;
             } catch (SecurityException | MalformedJwtException e) {
-                log.error("유효하지 않은 JWT 서명입니다.");
-                //exception
+                errorResponseHandler.send(response, HttpStatus.UNAUTHORIZED, "잘못된 JWT 토큰 형식입니다.");
                 return;
             } catch (UnsupportedJwtException e) {
-                log.error("지원되지 않는 JWT 토큰입니다.");
-                //exception
+                errorResponseHandler.send(response, HttpStatus.BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
                 return;
             } catch (IllegalArgumentException e) {
-                log.error("잘못된 JWT 토큰 형식입니다.");
-                //exception
+                errorResponseHandler.send(response, HttpStatus.BAD_REQUEST, e.getMessage());
+                return;
+            } catch (JwtException e) {
+                errorResponseHandler.send(response, HttpStatus.UNAUTHORIZED, "예상치 못한 JWT 토큰 오류: " + e.getMessage());
                 return;
             } catch (Exception e) {
-                log.error("예기치 못한 오류.");
-                //exception
+                errorResponseHandler.send(response, HttpStatus.INTERNAL_SERVER_ERROR, "예상치 못한 서버 오류: " + e.getMessage());
                 return;
             }
         }

@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(jwtSecurityProperties.secret().whiteList().toArray(new String[0])).permitAll()
                         .requestMatchers(jwtSecurityProperties.secret().adminList().toArray(new String[0])).hasAuthority(MemberRole.Authority.ADMIN)
-//                        .anyRequest().hasAnyAuthority(MemberRole.Authority.ADMIN, MemberRole.Authority.USER)
+//                        .anyRequest().hasAnyAuthority(MemberRole.Authority.ADMIN, MemberRole.Authority.USER, MemberRole.Authority.REPORTER)
                         .anyRequest().permitAll()   //MVP 개발용
                 )
                 .exceptionHandling(exceptions -> exceptions
