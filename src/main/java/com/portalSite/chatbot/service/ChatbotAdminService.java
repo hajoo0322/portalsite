@@ -5,6 +5,8 @@ import com.portalSite.chatbot.repository.ChatbotFaqRepository;
 import com.portalSite.chatbot.dto.AddFaqRequest;
 import com.portalSite.chatbot.dto.ChatbotFaqResponse;
 import com.portalSite.chatbot.dto.UpdateFaqRequest;
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ public class ChatbotAdminService {
     @Transactional
     public ChatbotFaqResponse updateFaq(Long faqId, Long memberId, UpdateFaqRequest request) {
         ChatbotFaq faq = chatbotFaqRepository.findById(faqId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 챗봇"));
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_FAQ_NOT_FOUND));
         faq.update(memberId, request);
         chatbotFaqRepository.save(faq);
         return ChatbotFaqResponse.from(faq);

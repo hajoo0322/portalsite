@@ -23,8 +23,9 @@ public enum ErrorCode {
 
 
     //chatbot
-    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 ROOM,.,, 작명실패"),
-    CHATROOM_IS_ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "이미 종료된 문의입니다... 작명 구림 수정예정")
+    CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 CHAT ROOM 입니다."),
+    CHAT_FAQ_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 FAQ 입니다."),
+    CHATROOM_IS_ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "이미 종료된 문의내역입니다.")
     ;
     private final HttpStatus status;
     private final String message;
