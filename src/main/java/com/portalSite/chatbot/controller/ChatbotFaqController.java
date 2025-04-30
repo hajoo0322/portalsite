@@ -66,4 +66,13 @@ public class ChatbotFaqController {
         chatbotFaqService.feedback(logId, authUser.memberId(), feedback);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping("/exit/{roomId}")
+    public ResponseEntity<Void> exit(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        chatbotFaqService.exit(roomId, authUser.memberId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

@@ -124,4 +124,15 @@ class ChatbotFaqServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_FEEDBACK.getMessage());
     }
+
+    @Test
+    void exit_정상작동() {
+        ChatbotRoom testRoom = MockChatbotRoomFactory.createRoom(999L, memberId, false);
+        when(roomRepository.findById(999L)).thenReturn(Optional.of(testRoom));
+
+        faqService.exit(999L, memberId);
+        
+        verify(roomRepository).findById(999L);
+    }
+
 }

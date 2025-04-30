@@ -39,8 +39,7 @@ public class ChatbotFaqService {
      */
     @Transactional
     public void handleQuestion(Long roomId, Long memberId, QuestionFaqRequest request) {
-        ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+        ChatbotRoom chatbotRoom = getChatbotRoom(roomId);
         chatbotRoom.isClosed();
         chatbotRoom.isEqualMember(memberId);
         String keyword = aiHelper.extractKeywords(request.input());
@@ -57,8 +56,7 @@ public class ChatbotFaqService {
     }
 
     public ChatbotLogGroupResponse getRoomLogs(Long roomId, Long memberId) {
-        ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+        ChatbotRoom chatbotRoom = getChatbotRoom(roomId);
         chatbotRoom.isEqualMember(memberId);
         List<ChatbotLog> chatbotLogs = chatbotLogRepository.findAllByChatbotRoomOrderByCreatedAtAsc(chatbotRoom);
         return ChatbotLogGroupResponse.from(chatbotRoom, chatbotLogs);
@@ -66,9 +64,30 @@ public class ChatbotFaqService {
 
     @Transactional
     public void feedback(Long logId, Long memberId, String feedback) {
-        ChatbotLog chatbotLog = chatbotLogRepository.findById(logId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_LOG_NOT_FOUND));
+        ChatbotLog chatbotLog = getChatbotLog(logId);
         chatbotLog.getChatbotRoom().isEqualMember(memberId);
+        chatbotLog.getChatbotRoom().isClosed();
         chatbotLog.feedback(Feedback.fromString(feedback));
+    }
+
+    @Transactional
+    public void exit(Long roomId, Long memberId) {
+        ChatbotRoom chatbotRoom = getChatbotRoom(roomId);
+        chatbotRoom.isClosed();
+        chatbotRoom.isEqualMember(memberId);
+        chatbotRoom.exit();
+    }
+
+    /**
+     * Helper
+     */
+    private ChatbotRoom getChatbotRoom(Long roomId) {
+        return chatbotRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+    }
+
+    private ChatbotLog getChatbotLog(Long logId) {
+        return chatbotLogRepository.findById(logId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_LOG_NOT_FOUND));
     }
 }
