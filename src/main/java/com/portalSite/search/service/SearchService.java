@@ -30,6 +30,6 @@ public class SearchService {
         List<NewsResponse> newsList = newsRepository.findAllByKeyword(keyword, pageable).stream()
                 .map(NewsResponse::from).toList();
 
-        return SearchResponse.from(blogPostList, cafePostList, newsList);
+        return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }
 }
