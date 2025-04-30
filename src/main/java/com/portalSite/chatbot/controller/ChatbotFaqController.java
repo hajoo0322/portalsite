@@ -56,4 +56,14 @@ public class ChatbotFaqController {
         ChatbotLogGroupResponse logs = chatbotFaqService.getRoomLogs(roomId, authUser.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(logs);
     }
+
+    @PostMapping("/feedback/{logId}")
+    public ResponseEntity<Void> feedback(
+            @PathVariable Long logId,
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam String feedback
+    ) {
+        chatbotFaqService.feedback(logId, authUser.memberId(), feedback);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

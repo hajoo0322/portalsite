@@ -3,6 +3,7 @@ package com.portalSite.chatbot.service;
 import com.portalSite.chatbot.dto.*;
 import com.portalSite.chatbot.entity.ChatbotLog;
 import com.portalSite.chatbot.entity.ChatbotRoom;
+import com.portalSite.chatbot.entity.Feedback;
 import com.portalSite.chatbot.repository.*;
 import com.portalSite.common.exception.custom.CustomException;
 import com.portalSite.common.exception.custom.ErrorCode;
@@ -61,5 +62,13 @@ public class ChatbotFaqService {
         chatbotRoom.isEqualMember(memberId);
         List<ChatbotLog> chatbotLogs = chatbotLogRepository.findAllByChatbotRoomOrderByCreatedAtAsc(chatbotRoom);
         return ChatbotLogGroupResponse.from(chatbotRoom, chatbotLogs);
+    }
+
+    @Transactional
+    public void feedback(Long logId, Long memberId, String feedback) {
+        ChatbotLog chatbotLog = chatbotLogRepository.findById(logId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHAT_LOG_NOT_FOUND));
+        chatbotLog.getChatbotRoom().isEqualMember(memberId);
+        chatbotLog.feedback(Feedback.fromString(feedback));
     }
 }
