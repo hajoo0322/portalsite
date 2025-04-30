@@ -29,6 +29,12 @@ public class CafeMemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cafeMemberResponse);
     }
 
+    @GetMapping("/duplication")
+    public ResponseEntity<Void> duplicateCafeMemberName(@RequestParam String name) {
+        cafeMemberService.duplicateCafeMemberName(name);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping
     public ResponseEntity<CafeMemberResponse> getCafeMember(
             @PathVariable Long cafeId,

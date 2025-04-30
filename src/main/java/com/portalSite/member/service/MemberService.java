@@ -1,24 +1,50 @@
 package com.portalSite.member.service;
 
 import com.portalSite.member.dto.request.*;
+import com.portalSite.member.dto.response.MemberGetForAdminResponse;
+import com.portalSite.member.dto.response.MemberGetForUserResponse;
 import com.portalSite.member.dto.response.MemberResponse;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.entity.MemberRole;
 import com.portalSite.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public MemberResponse getMember(Long memberId) {
+    @Transactional(readOnly = true)
+    public MemberResponse getMyInfo(Long memberId) {
         Member foundMember = memberRepository.findById(memberId).orElseThrow(
                 () -> new RuntimeException(""));
         return MemberResponse.from(foundMember);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberGetForUserResponse getMemberForUser(Long memberId) {
+        Member foundMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException(""));
+        return MemberGetForUserResponse.from(foundMember);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberGetForAdminResponse getMemberForAdmin(Long memberId) {
+        Member foundMember = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException(""));
+        return MemberGetForAdminResponse.from(foundMember);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MemberResponse> getMembers(Long memberId) {
+        validAdmin(memberId);
+        return memberRepository.findAll().stream().map(MemberResponse::from).toList();
     }
 
     /**
@@ -76,10 +102,23 @@ public class MemberService {
         foundMember.softDelete();
     }
 
+    @Transactional
+    public void requestRestore(Long memberId, MemberRestoreRequest request, Long loggedInId) {
+        Member foundMember = validId(memberId, loggedInId);
+        if (!passwordEncoder.matches(request.password(), foundMember.getPassword()) ||
+                !foundMember.getName().equals(request.name()) ||
+                !foundMember.getPhoneNumber().equals(request.phoneNumber()) ||
+                !foundMember.getEmail().equals(request.email())) {
+            throw new RuntimeException("");
+        }
+
+        foundMember.restoreRequest();
+    }
+
     /**
-     * 1. request, 로그인된 ID 입력받음
+     * 1. request, 로그인된 ID 입력받음<br>
      * 2. 로그인된 id가 어드민인지 확인<br>
-     * 3. email 기준 멤버 객체 조회, request와 대조.
+     * 3. email 기준 멤버 객체 조회, request와 대조.<br>
      * 4. 일치할 시 멤버 객체의 isDeleted false 로 변환
      */
     @Transactional
@@ -87,11 +126,6 @@ public class MemberService {
         validAdmin(loggedInId);
         Member foundMember = memberRepository.findByEmail(request.email()).orElseThrow(
                 () -> new RuntimeException(""));
-        if (!foundMember.getPassword().equals(request.password()) ||
-                !foundMember.getName().equals(request.name()) ||
-                !foundMember.getPhoneNumber().equals(request.phoneNumber())) {
-            throw new RuntimeException("");
-        }
 
         foundMember.restore();
         return MemberResponse.from(foundMember);
@@ -116,7 +150,7 @@ public class MemberService {
     }
 
     private void validPassword(Member member, String currentPassword) {
-        if (!member.getPassword().equals(currentPassword)) {
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
             throw new RuntimeException("");
         }
     }

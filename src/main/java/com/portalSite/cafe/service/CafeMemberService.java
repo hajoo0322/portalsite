@@ -8,6 +8,8 @@ import com.portalSite.cafe.entity.CafeMember;
 import com.portalSite.cafe.repository.CafeLevelRepository;
 import com.portalSite.cafe.repository.CafeMemberRepository;
 import com.portalSite.cafe.repository.CafeRepository;
+import com.portalSite.common.exception.core.DuplicateNameException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,9 @@ public class CafeMemberService {
 
     @Transactional
     public CafeMemberResponse addCafeMember(CafeMemberRequest cafeMemberRequest, Long memberId, Long cafeId) {
+        if (cafeMemberRepository.existsByNickname(cafeMemberRequest.nickname())) {
+            throw new DuplicateNameException(ErrorCode.DUPLICATE_NAME);
+        }
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new RuntimeException(""));
@@ -98,11 +103,19 @@ public class CafeMemberService {
         }
     }
 
+    @Transactional
     public CafeMemberResponse addFirstCafeMember(Long memberId, Long cafeId, CafeMemberRequest cafeMemberRequest) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new RuntimeException(""));
         CafeMember cafeMember = CafeMember.of(cafe, member, cafeLevel, cafeMemberRequest.nickname());
-        return null;
+        CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
+        return CafeMemberResponse.from(savedCafeMember);
+    }
+
+    public void duplicateCafeMemberName(String nickname) {
+        cafeMemberRepository.findByNickname(nickname).ifPresent(cafeMember -> {
+            throw new DuplicateNameException(ErrorCode.DUPLICATE_NAME);
+        });
     }
 }

@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "cafe_member")
+@Table(name = "cafe_member",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"cafe_id","nickname"})
+    })
 @NoArgsConstructor
 public class CafeMember extends BaseEntity {
 

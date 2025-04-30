@@ -1,6 +1,8 @@
 package com.portalSite.cafe.repository;
 
 import com.portalSite.cafe.entity.CafeMember;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,4 +13,7 @@ public interface CafeMemberRepository extends JpaRepository<CafeMember, Long> {
 
     List<CafeMember> findAllByCafeId(Long cafeId);
 
+    Optional<CafeMember> findByNickname(String nickname);
+
+    boolean existsByNickname(String nickname);
 }

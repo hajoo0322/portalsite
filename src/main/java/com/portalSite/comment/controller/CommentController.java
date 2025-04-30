@@ -5,6 +5,7 @@ import com.portalSite.comment.dto.response.CommentResponse;
 import com.portalSite.comment.entity.PostType;
 import com.portalSite.comment.service.CommentService;
 import com.portalSite.security.AuthUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class CommentController {
     @PostMapping("/posts/{postId}")
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable Long postId,
-            @RequestBody CommentRequest commentRequest,
+            @RequestBody @Valid CommentRequest commentRequest,
             @RequestParam(name = "type")PostType type,
             @AuthenticationPrincipal AuthUser authUser
             ) {
@@ -50,7 +51,7 @@ public class CommentController {
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
-            @RequestBody CommentRequest request,
+            @RequestBody @Valid CommentRequest request,
             @AuthenticationPrincipal AuthUser authUser
     ) {
         CommentResponse response = commentService.updateComment(commentId, request, authUser.memberId());

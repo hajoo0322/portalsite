@@ -3,9 +3,11 @@ package com.portalSite.cafe.controller;
 import com.portalSite.cafe.dto.CafePostRequest;
 import com.portalSite.cafe.dto.CafePostResponse;
 import com.portalSite.cafe.service.CafePostService;
+import com.portalSite.security.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +18,13 @@ public class CafePostController {
 
     private final CafePostService cafePostService;
 
-    @PostMapping("/cafes/{cafeId}/members/{memberId}/cafe-boards/{cafeBoardId}/cafe-posts")
-    public ResponseEntity<CafePostResponse> addCafePost(@RequestBody CafePostRequest cafePostRequest, @PathVariable Long cafeId, @PathVariable Long cafeBoardId,@PathVariable Long memberId) {
-        CafePostResponse cafePostResponse = cafePostService.addCafePost(cafePostRequest, cafeId, cafeBoardId,memberId);
+    @PostMapping("/cafes/{cafeId}/cafe-boards/{cafeBoardId}/cafe-posts")
+    public ResponseEntity<CafePostResponse> addCafePost(
+            @RequestBody CafePostRequest cafePostRequest,
+            @PathVariable Long cafeId,
+            @PathVariable Long cafeBoardId,
+            @AuthenticationPrincipal AuthUser authUser) {
+        CafePostResponse cafePostResponse = cafePostService.addCafePost(cafePostRequest, cafeId, cafeBoardId,authUser.memberId());
         return ResponseEntity.status(HttpStatus.CREATED).body(cafePostResponse);
     }
 
