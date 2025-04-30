@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>AI 챗봇</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+        .chat-box { border: 1px solid #ccc; padding: 1rem; height: 400px; overflow-y: auto; }
+        .message { margin: 0.5rem 0; padding: 0.5rem; border-radius: 8px; max-width: 70%; }
+        .me { background-color: #d1e7dd; text-align: right; margin-left: auto; }
+        .bot { background-color: #f8d7da; text-align: left; margin-right: auto; }
+        #controls { margin-top: 1rem; display: flex; gap: 0.5rem; }
+        input, button { padding: 0.5rem; font-size: 1rem; }
+        #tokenInput { width: 100%; }
+    </style>
+</head>
+<body>
+<h2>봇 채팅</h2>
+<div>
+    <input id="tokenInput" placeholder="JWT 토큰 입력" />
+    <button onclick="connect()">웹소켓 연결</button>
+</div>
+
+<div class="chat-box" id="chatBox"></div>
+
+<div id="controls">
+    <input id="messageInput" placeholder="메시지 입력" style="flex: 1;" />
+    <button onclick="sendMessage()">보내기</button>
+</div>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const token = document.getElementById('tokenInput').value;
+        const socket = new SockJS(`http://localhost:7111/ws?token=${encodeURIComponent(token)}`);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({ Authorization: 'Bearer ' + token }, (frame) => {
+            console.log('Connected:', frame);
+            stompClient.subscribe('/topic/message', (message) => {
+                const body = JSON.parse(message.body);
+                if (body && body.answer) {
+                    appendMessage('봇', body.answer, 'bot');
+                }
+            });
+        }, (error) => {
+            alert('연결 실패: ' + error);
+        });
+    }
+
+    function sendMessage() {
+        const content = document.getElementById('messageInput').value;
+        const token = document.getElementById('tokenInput').value;
+        const roomId = 1;
+
+        if (!content || !token) return;
+
+        appendMessage('나', content, 'me');
+
+        fetch(`http://localhost:7111/faq/${roomId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ input: content })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("API 호출 실패");
+            })
+            .catch(err => {
+                alert("메시지 전송 실패: " + err.message);
+            });
+
+        document.getElementById('messageInput').value = '';
+    }
+
+    function appendMessage(sender, text, cssClass) {
+        const msg = document.createElement('div');
+        msg.className = 'message ' + cssClass;
+        msg.innerText = (cssClass === 'bot' ? '봇: ' : '나: ') + text;
+        document.getElementById('chatBox').appendChild(msg);
+        document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+    }
+</script>
+</body>
+</html>

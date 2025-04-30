@@ -50,7 +50,7 @@ public class CafeBoardService {
 
     @Transactional
     public void deleteCafeBoard(Long cafeBoardId) {
-        CafeBoard cafeBoard = cafeBoardRepository.findById(cafeBoardId).orElseThrow(() -> new RuntimeException(""));
+        CafeBoard cafeBoard = cafeBoardRepository.findById(cafeBoardId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_BOARD_NOT_FOUND));
         cafeBoardRepository.delete(cafeBoard);
     }
 
