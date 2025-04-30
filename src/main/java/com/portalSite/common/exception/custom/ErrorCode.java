@@ -17,11 +17,17 @@ public enum ErrorCode {
 
     //cafe
     CAFE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카페입니다."),
-    CAFE_BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지않는 게시판입니다.")
+    CAFE_BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지않는 게시판입니다."),
+    CAFE_LEVEL_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 카페 등급입니다."),
+    CAFE_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 카페 멤버입니다."),
+    CAFE_POST_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 카페 게시글입니다."),
 
     //like
 
     //news
+
+    //member
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 멤버입니다.")
 
 
     ;

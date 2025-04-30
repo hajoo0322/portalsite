@@ -7,6 +7,8 @@ import com.portalSite.cafe.entity.Cafe;
 import com.portalSite.cafe.entity.CafeLevel;
 import com.portalSite.cafe.repository.CafeLevelRepository;
 import com.portalSite.cafe.repository.CafeRepository;
+import com.portalSite.common.exception.core.NotFoundException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ public class CafeLevelService {
 
     @Transactional
     public List<CafeLevelResponse> addCafeLevel(CafeLevelRequestList cafeLevelRequest, Long cafeId) {
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
         List<CafeLevel> cafeLevelList = cafeLevelRequest.cafeLevelRequestList().stream()
                 .map(req -> CafeLevel.of(cafe, req.grade(), req.description(), req.autoLevel(), req.gradeOrder(),
                         req.visitCount(), req.commentCount(), req.postCount())).toList();
@@ -35,9 +37,6 @@ public class CafeLevelService {
     @Transactional(readOnly = true)
     public List<CafeLevelResponse> getCafeLevel(Long cafeId) {
         List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeIdOrderByGradeOrderDesc(cafeId);
-        if (cafeLevelList.isEmpty()) {
-            throw new RuntimeException("");
-        }
         return cafeLevelList.stream().map(CafeLevelResponse::from).toList();
     }
 
