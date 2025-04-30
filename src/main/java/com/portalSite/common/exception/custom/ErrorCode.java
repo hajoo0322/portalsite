@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
     //auth
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // duplicate
@@ -28,13 +27,13 @@ public enum ErrorCode {
     //news
 
     //member
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 멤버입니다.")
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 멤버입니다."),
 
 
     //chatbot
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 CHAT ROOM 입니다."),
     CHAT_FAQ_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 FAQ 입니다."),
-    CHATROOM_IS_ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "이미 종료된 문의내역입니다.")
+    CHATROOM_IS_ALREADY_CLOSED(HttpStatus.BAD_REQUEST, "이미 종료된 문의내역입니다."),
     ;
     private final HttpStatus status;
     private final String message;
