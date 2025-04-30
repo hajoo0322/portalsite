@@ -1,6 +1,7 @@
 package com.portalSite.mock;
 
 import com.portalSite.chatbot.entity.ChatbotRoom;
+import com.portalSite.util.SetUtil;
 
 public class MockChatbotRoomFactory {
     public static ChatbotRoom createRoom(Long id, Long memberId, boolean isClosed) {
@@ -14,17 +15,7 @@ public class MockChatbotRoomFactory {
                 throw new RuntimeException(e);
             }
         }
-        setId(room, id);
+        SetUtil.setId(room, id);
         return room;
-    }
-
-    private static void setId(ChatbotRoom room, Long id) {
-        try {
-            var field = ChatbotRoom.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(room, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

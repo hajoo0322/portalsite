@@ -10,6 +10,7 @@ import com.portalSite.common.exception.custom.CustomException;
 import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.mock.MockChatbotLogFactory;
 import com.portalSite.mock.MockChatbotRoomFactory;
+import com.portalSite.util.SetUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ class ChatbotFaqServiceTest {
     void createRoom_정상작동() {
         when(roomRepository.save(any(ChatbotRoom.class))).thenAnswer(invocation -> {
             ChatbotRoom room = invocation.getArgument(0);
-            setId(room, 10L);
+            SetUtil.setId(room, 10L);
             return room;
         });
 
@@ -122,15 +123,5 @@ class ChatbotFaqServiceTest {
         assertThatThrownBy(() -> faqService.feedback(100L, memberId, "good"))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_FEEDBACK.getMessage());
-    }
-
-    private void setId(ChatbotRoom room, Long id) {
-        try {
-            var field = ChatbotRoom.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(room, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

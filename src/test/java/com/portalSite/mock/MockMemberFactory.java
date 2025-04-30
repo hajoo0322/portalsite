@@ -3,6 +3,7 @@ package com.portalSite.mock;
 import com.portalSite.auth.RegisterRequest;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.entity.MemberRole;
+import com.portalSite.util.SetUtil;
 
 public class MockMemberFactory {
 
@@ -16,7 +17,7 @@ public class MockMemberFactory {
                 "선량한시민"
         );
         Member user = Member.of(request, "encodedUserPassword!@#");
-        setId(user, id);
+        SetUtil.setId(user, id);
         return user;
     }
 
@@ -31,7 +32,7 @@ public class MockMemberFactory {
         );
         Member admin = Member.of(request, "encodedAdminPassword@!$");
         admin.changeMemberRole(MemberRole.ADMIN);
-        setId(admin, id);
+        SetUtil.setId(admin, id);
         return admin;
     }
 
@@ -46,17 +47,7 @@ public class MockMemberFactory {
         );
         Member reporter = Member.of(request, "encodedReporterPwd#123");
         reporter.changeMemberRole(MemberRole.REPORTER);
-        setId(reporter, id);
+        SetUtil.setId(reporter, id);
         return reporter;
-    }
-
-    private static void setId(Member member, Long id) {
-        try {
-            var field = Member.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(member, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
