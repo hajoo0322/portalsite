@@ -9,6 +9,7 @@ import com.portalSite.news.repository.NewsRepository;
 import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,14 +21,14 @@ public class SearchService {
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
 
-    public SearchResponse search(SearchRequest request) {
+    public SearchResponse search(SearchRequest request, Pageable pageable) {
         String keyword = request.keyword();
 
-        List<BlogPostResponse> blogPostList = blogPostRepository.findAllByKeyword(keyword).stream()
+        List<BlogPostResponse> blogPostList = blogPostRepository.findAllByKeyword(keyword, pageable).stream()
                 .map(BlogPostResponse::from).toList();
-        List<CafePostResponse> cafePostList = cafePostRepository.findAllByKeyword(keyword).stream()
+        List<CafePostResponse> cafePostList = cafePostRepository.findAllByKeyword(keyword, pageable).stream()
                 .map(CafePostResponse::from).toList();
-        List<NewsResponse> newsList = newsRepository.findAllByKeyword(keyword).stream()
+        List<NewsResponse> newsList = newsRepository.findAllByKeyword(keyword, pageable).stream()
                 .map(NewsResponse::from).toList();
 
         return SearchResponse.from(blogPostList, cafePostList, newsList);
