@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -56,11 +55,11 @@ public class ChatbotFaqService {
         return chatbotRoomRepository.findAllWithLatestLog(memberId);
     }
 
-    public List<ChatbotLogGroupResponse> getRoomLogs(Long roomId, Long memberId) {
+    public ChatbotLogGroupResponse getRoomLogs(Long roomId, Long memberId) {
         ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
         chatbotRoom.isEqualMember(memberId);
         List<ChatbotLog> chatbotLogs = chatbotLogRepository.findAllByChatbotRoomOrderByCreatedAtAsc(chatbotRoom);
-        return Collections.singletonList(ChatbotLogGroupResponse.from(chatbotRoom, chatbotLogs));
+        return ChatbotLogGroupResponse.from(chatbotRoom, chatbotLogs);
     }
 }

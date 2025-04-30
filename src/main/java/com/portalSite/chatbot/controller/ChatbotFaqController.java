@@ -49,11 +49,11 @@ public class ChatbotFaqController {
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<List<ChatbotLogGroupResponse>> getRoomLogs(
+    public ResponseEntity<ChatbotLogGroupResponse> getRoomLogs(
             @PathVariable Long roomId,
             @AuthenticationPrincipal AuthUser authUser
     ) {
-        List<ChatbotLogGroupResponse> logs = chatbotFaqService.getRoomLogs(roomId, authUser.memberId());
+        ChatbotLogGroupResponse logs = chatbotFaqService.getRoomLogs(roomId, authUser.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(logs);
     }
 }
