@@ -10,6 +10,9 @@ public enum ErrorCode {
     //auth
     FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "해당 이메일로 가입된 정보가 있습니다."),
+    ID_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "ID가 중복됩니다."),
+    LOGIN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "아이디나 비밀번호가 올바르지 않습니다."),
 
     // duplicate
     DUPLICATE_NAME(HttpStatus.BAD_REQUEST, "중복된 이름 입니다."),

@@ -25,11 +25,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ChatbotAdminServiceTest {
 
-    @Mock
-    private ChatbotFaqRepository faqRepository;
-
-    @InjectMocks
-    private ChatbotAdminService adminService;
+    @Mock private ChatbotFaqRepository faqRepository;
+    @InjectMocks private ChatbotAdminService adminService;
 
     private final Long adminId = MockMemberFactory.createAdmin(1L).getId();
     private ChatbotFaq dummyFaq;

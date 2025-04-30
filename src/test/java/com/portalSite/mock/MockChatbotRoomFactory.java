@@ -4,6 +4,7 @@ import com.portalSite.chatbot.entity.ChatbotRoom;
 import com.portalSite.util.SetUtil;
 
 public class MockChatbotRoomFactory {
+
     public static ChatbotRoom createRoom(Long id, Long memberId, boolean isClosed) {
         ChatbotRoom room = ChatbotRoom.of(memberId);
         if (isClosed) {
