@@ -81,6 +81,10 @@ public class Member extends BaseEntity {
         this.memberStatus = MemberStatus.DELETED;
     }
 
+    public void restoreRequest() {
+        this.memberStatus = MemberStatus.RESTORE_REQUESTED;
+    }
+
     public void restore() {
         this.memberStatus = MemberStatus.NORMAL;
     }
