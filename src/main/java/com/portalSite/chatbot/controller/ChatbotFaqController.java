@@ -1,5 +1,6 @@
 package com.portalSite.chatbot.controller;
 
+import com.portalSite.chatbot.dto.ChatbotRoomResponse;
 import com.portalSite.chatbot.dto.FaqQuestionRequest;
 import com.portalSite.chatbot.service.ChatbotFaqService;
 import com.portalSite.security.AuthUser;
@@ -8,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/faq")
@@ -34,5 +37,13 @@ public class ChatbotFaqController {
     ) {
         chatbotFaqService.handleQuestion(roomId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ChatbotRoomResponse>> getMyRooms(
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        List<ChatbotRoomResponse> rooms = chatbotFaqService.getMyRooms(authUser.memberId());
+        return ResponseEntity.status(HttpStatus.OK).body(rooms);
     }
 }

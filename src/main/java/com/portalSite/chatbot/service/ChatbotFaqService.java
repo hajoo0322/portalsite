@@ -1,6 +1,7 @@
 package com.portalSite.chatbot.service;
 
 import com.portalSite.chatbot.dto.ChatbotAnswerMessage;
+import com.portalSite.chatbot.dto.ChatbotRoomResponse;
 import com.portalSite.chatbot.dto.FaqQuestionRequest;
 import com.portalSite.chatbot.entity.ChatbotLog;
 import com.portalSite.chatbot.entity.ChatbotRoom;
@@ -10,6 +11,8 @@ import com.portalSite.common.exception.custom.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +51,9 @@ public class ChatbotFaqService {
                 : "아직 답변이 준비되지 않았습니다. 1대1 고객센터를 이용해주세요.";
         ChatbotLog chatbotLog = chatbotLogRepository.save(ChatbotLog.of(chatbotRoom, request.input(), answer));
         broker.publish(ChatbotAnswerMessage.from(chatbotLog.getId(), answer));
+    }
+
+    public List<ChatbotRoomResponse> getMyRooms(Long memberId) {
+        return chatbotRoomRepository.findAllWithLatestLog(memberId);
     }
 }
