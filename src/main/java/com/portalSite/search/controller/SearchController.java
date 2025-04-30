@@ -4,6 +4,8 @@ import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import com.portalSite.search.service.SearchService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,10 +22,12 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<SearchResponse> search(
-            @ModelAttribute @Valid SearchRequest request,
-            @PageableDefault(size = 10, sort = "id", direction = DESC) Pageable pageable
+            @RequestParam("keyword")
+            @NotBlank(message="검색어를 입력해주세요")
+            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요")String keyword,
+            @PageableDefault(sort = "id", direction = DESC) Pageable pageable
             ) {
-        SearchResponse response = searchService.search(request, pageable);
+        SearchResponse response = searchService.search(keyword, pageable);
         return ResponseEntity.ok(response);
     }
 }

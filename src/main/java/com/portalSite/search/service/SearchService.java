@@ -21,8 +21,7 @@ public class SearchService {
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
 
-    public SearchResponse search(SearchRequest request, Pageable pageable) {
-        String keyword = request.keyword();
+    public SearchResponse search(String keyword, Pageable pageable) {
 
         List<BlogPostResponse> blogPostList = blogPostRepository.findAllByKeyword(keyword, pageable).stream()
                 .map(BlogPostResponse::from).toList();
