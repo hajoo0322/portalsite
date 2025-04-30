@@ -11,6 +11,7 @@ public record ChatbotRoomResponse(
         String lastSentContent,
         Boolean isClosed
 ) {
+    //JPQL 용 생성자
     public ChatbotRoomResponse(ChatbotRoom room, ChatbotLog latestLog) {
         this(
                 room.getId(),

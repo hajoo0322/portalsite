@@ -1,8 +1,6 @@
 package com.portalSite.chatbot.service;
 
-import com.portalSite.chatbot.dto.ChatbotAnswerMessage;
-import com.portalSite.chatbot.dto.ChatbotRoomResponse;
-import com.portalSite.chatbot.dto.FaqQuestionRequest;
+import com.portalSite.chatbot.dto.*;
 import com.portalSite.chatbot.entity.ChatbotLog;
 import com.portalSite.chatbot.entity.ChatbotRoom;
 import com.portalSite.chatbot.repository.*;
@@ -12,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -39,7 +38,7 @@ public class ChatbotFaqService {
      * > 응답을 WebSocket 으로 전송
      */
     @Transactional
-    public void handleQuestion(Long roomId, Long memberId, FaqQuestionRequest request) {
+    public void handleQuestion(Long roomId, Long memberId, QuestionFaqRequest request) {
         ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
         chatbotRoom.isClosed();
@@ -55,5 +54,13 @@ public class ChatbotFaqService {
 
     public List<ChatbotRoomResponse> getMyRooms(Long memberId) {
         return chatbotRoomRepository.findAllWithLatestLog(memberId);
+    }
+
+    public List<ChatbotLogGroupResponse> getRoomLogs(Long roomId, Long memberId) {
+        ChatbotRoom chatbotRoom = chatbotRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+        chatbotRoom.isEqualMember(memberId);
+        List<ChatbotLog> chatbotLogs = chatbotLogRepository.findAllByChatbotRoomOrderByCreatedAtAsc(chatbotRoom);
+        return Collections.singletonList(ChatbotLogGroupResponse.from(chatbotRoom, chatbotLogs));
     }
 }

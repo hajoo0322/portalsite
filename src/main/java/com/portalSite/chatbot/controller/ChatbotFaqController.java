@@ -1,7 +1,8 @@
 package com.portalSite.chatbot.controller;
 
+import com.portalSite.chatbot.dto.ChatbotLogGroupResponse;
 import com.portalSite.chatbot.dto.ChatbotRoomResponse;
-import com.portalSite.chatbot.dto.FaqQuestionRequest;
+import com.portalSite.chatbot.dto.QuestionFaqRequest;
 import com.portalSite.chatbot.service.ChatbotFaqService;
 import com.portalSite.security.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class ChatbotFaqController {
     public ResponseEntity<Void> handleFaqQuestion(
             @PathVariable Long roomId,
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody FaqQuestionRequest request
+            @RequestBody QuestionFaqRequest request
     ) {
         chatbotFaqService.handleQuestion(roomId, authUser.memberId(), request);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -45,5 +46,14 @@ public class ChatbotFaqController {
     ) {
         List<ChatbotRoomResponse> rooms = chatbotFaqService.getMyRooms(authUser.memberId());
         return ResponseEntity.status(HttpStatus.OK).body(rooms);
+    }
+
+    @GetMapping("/{roomId}")
+    public ResponseEntity<List<ChatbotLogGroupResponse>> getRoomLogs(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        List<ChatbotLogGroupResponse> logs = chatbotFaqService.getRoomLogs(roomId, authUser.memberId());
+        return ResponseEntity.status(HttpStatus.OK).body(logs);
     }
 }

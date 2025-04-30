@@ -1,6 +1,6 @@
 package com.portalSite.chatbot.dto;
 
-public record FaqQuestionRequest(
+public record QuestionFaqRequest(
         String input
 ) {
 }
