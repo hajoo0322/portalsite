@@ -32,7 +32,7 @@ public class NewsController {
     private final NewsService newsService;
 
     @PostMapping()
-    @PreAuthorize("hasRole('REPORTER')")
+    @Secured(MemberRole.Authority.REPORTER)
     public ResponseEntity<NewsResponse> createNews(
             @Valid @RequestBody NewsCreateRequest requestDto,
             @AuthenticationPrincipal AuthUser authUser
