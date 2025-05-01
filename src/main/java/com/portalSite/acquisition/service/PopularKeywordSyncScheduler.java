@@ -3,7 +3,9 @@ package com.portalSite.acquisition.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsMetadata;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,11 +16,27 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class PopularKeywordSyncScheduler {
-    private final KafkaStreams kafkaStreams;
+public class PopularKeywordSyncScheduler implements InitializingBean {
+
+    private final StreamsBuilderFactoryBean factoryBean;
     private final RedisTemplate<String, String> redisTemplate;
     private final WebClient.Builder webclientBuilder;
 
+    private  KafkaStreams kafkaStreams;
+
+    @Override
+    public void afterPropertiesSet() {
+        this.kafkaStreams = waitForKafkaStreams(factoryBean);
+    }
+
+    private KafkaStreams waitForKafkaStreams(StreamsBuilderFactoryBean factoryBean) {
+        while (factoryBean.getKafkaStreams() == null) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
+        }
+        return factoryBean.getKafkaStreams();
+    }
     @Scheduled(fixedDelay = 10000)
     public void syncTopKeywordToRedis() {
 

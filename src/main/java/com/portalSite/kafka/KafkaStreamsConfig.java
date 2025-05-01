@@ -1,4 +1,4 @@
-package com.portalSite.acquisition.service;
+package com.portalSite.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +32,7 @@ public class KafkaStreamsConfig {
                 );
         return stream;
     }
+
 
     private PopularSearchEvent parseToEvent(String json) {
         try {
