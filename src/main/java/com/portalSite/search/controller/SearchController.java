@@ -1,5 +1,6 @@
 package com.portalSite.search.controller;
 
+import com.portalSite.comment.entity.PostType;
 import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import com.portalSite.search.service.SearchService;
@@ -23,11 +24,12 @@ public class SearchController {
     @GetMapping
     public ResponseEntity<SearchResponse> search(
             @RequestParam("keyword")
-            @NotBlank(message="검색어를 입력해주세요")
-            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요")String keyword,
+            @NotBlank(message = "검색어를 입력해주세요")
+            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
+            @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
-            ) {
-        SearchResponse response = searchService.search(keyword, pageable);
+    ) {
+        SearchResponse response = searchService.search(keyword, pageable, postType);
         return ResponseEntity.ok(response);
     }
 }
