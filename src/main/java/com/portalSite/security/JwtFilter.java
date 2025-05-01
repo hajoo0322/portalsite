@@ -87,7 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
         MemberRole userRole = MemberRole.of(data[1]);
 
         AuthUser authUser = AuthUser.of(memberId, userRole);
-        JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(authUser, token);
+        JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(authUser);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 }

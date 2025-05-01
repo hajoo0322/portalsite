@@ -1,6 +1,8 @@
 package com.portalSite.chatbot.entity;
 
 import com.portalSite.common.BaseEntity;
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,8 +26,19 @@ public class ChatbotLog extends BaseEntity {
 
     private String answer;
 
+    @Enumerated(EnumType.STRING)
+    private Feedback feedback = Feedback.UNKNOWN;
+
     public static ChatbotLog of(ChatbotRoom room, String question, String answer) {
         return new ChatbotLog(room, question, answer);
+    }
+
+    public void feedback(Feedback feedback) {
+        if (this.feedback == Feedback.UNKNOWN) {
+            this.feedback = feedback;
+            return;
+        }
+        throw new CustomException(ErrorCode.ALREADY_FEEDBACK);
     }
 
     private ChatbotLog(ChatbotRoom room, String question, String answer) {
