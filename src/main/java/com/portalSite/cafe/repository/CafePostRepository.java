@@ -8,15 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
-public interface CafePostRepository extends JpaRepository<CafePost, Long> {
+public interface CafePostRepository extends JpaRepository<CafePost, Long>, CafePostRepositoryCustom {
 
     List<CafePost> findAllByCafeId(Long cafeId);
-
-    @Query("""
-            SELECT cp
-            FROM CafePost cp
-            WHERE cp.title LIKE %:keyword%
-                OR cp.description LIKE %:keyword%
-            """)
-    Page<CafePost> findAllByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

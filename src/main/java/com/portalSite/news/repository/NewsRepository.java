@@ -9,15 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface NewsRepository extends JpaRepository<News, Long> {
+public interface NewsRepository extends JpaRepository<News, Long>, NewsRepositoryCustom {
 
     List<News> findAllByNewsCategoryId(Long categoryId);
-
-    @Query("""
-            SELECT n
-            FROM News n
-            WHERE n.newsTitle LIKE %:keyword%
-                OR n.description LIKE %:keyword%
-            """)
-    Page<News> findAllByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
