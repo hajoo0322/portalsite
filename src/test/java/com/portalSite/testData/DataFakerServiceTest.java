@@ -18,6 +18,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,7 +31,8 @@ import java.util.Locale;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-public class DataFakerService {
+public class DataFakerServiceTest {
+
     @Autowired
     CafePostRepository cafePostRepository;
     @Autowired

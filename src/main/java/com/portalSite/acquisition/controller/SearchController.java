@@ -3,6 +3,7 @@ package com.portalSite.acquisition.controller;
 import com.portalSite.acquisition.dto.SearchClickRequest;
 import com.portalSite.acquisition.dto.SearchDwellRequest;
 import com.portalSite.acquisition.service.PublishLogService;
+import com.portalSite.common.annotation.CurrentClientIp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,11 @@ public class SearchController {
     private final PublishLogService publishLogService;
 
     @PostMapping("/click")
-    public ResponseEntity<Void> logClick(@RequestBody SearchClickRequest searchClickRequest) {
-
+    public ResponseEntity<Void> logClick(
+            @RequestBody SearchClickRequest searchClickRequest,
+            @CurrentClientIp String clientIp
+    ) {
+        publishLogService.sendClickEvent(searchClickRequest,clientIp);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
