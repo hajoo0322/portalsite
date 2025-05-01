@@ -41,6 +41,10 @@ public class ChatbotRoom extends BaseEntity {
         }
     }
 
+    public void exit() {
+        this.isClosed = true;
+    }
+
     private ChatbotRoom(Long memberId) {
         this.memberId = memberId;
     }
