@@ -1,4 +1,4 @@
-package com.portalSite.acquisition.dto;
+package com.portalSite.acquisition.dto.request;
 
 import java.time.LocalDateTime;
 

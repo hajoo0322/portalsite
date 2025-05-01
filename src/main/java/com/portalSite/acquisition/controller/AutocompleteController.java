@@ -1,6 +1,6 @@
 package com.portalSite.acquisition.controller;
 
-import com.portalSite.acquisition.dto.AutocompleteClickRequest;
+import com.portalSite.acquisition.dto.request.AutocompleteClickRequest;
 import com.portalSite.acquisition.service.PublishLogService;
 import com.portalSite.common.annotation.CurrentClientIp;
 import lombok.RequiredArgsConstructor;

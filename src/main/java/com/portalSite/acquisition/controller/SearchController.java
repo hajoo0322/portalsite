@@ -1,7 +1,7 @@
 package com.portalSite.acquisition.controller;
 
-import com.portalSite.acquisition.dto.SearchClickRequest;
-import com.portalSite.acquisition.dto.SearchDwellRequest;
+import com.portalSite.acquisition.dto.request.SearchClickRequest;
+import com.portalSite.acquisition.dto.request.SearchDwellRequest;
 import com.portalSite.acquisition.service.PublishLogService;
 import com.portalSite.common.annotation.CurrentClientIp;
 import lombok.RequiredArgsConstructor;
