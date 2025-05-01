@@ -14,6 +14,13 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -50,6 +57,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     depends_on:
       - database
+      - redis
     command: >
       java
       -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
