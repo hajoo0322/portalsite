@@ -5,10 +5,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -18,10 +17,8 @@ public class SearchRankingService {
     private final StringRedisTemplate redisTemplate;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String RANKING_KEY_PREFIX = "search_rank:";
+    private static final String RANKING_KEY_PREFIX = "search_rank:current";
     private static final String TOPIC = "search-log";
-
-    private static final int RANKTIME = 5;
 
 
     public void sendSearchLog(String keyword) {
@@ -29,45 +26,45 @@ public class SearchRankingService {
     }
 
     public List<String> getTopSearchKeywords(int topN) {
+        Set<String> result = redisTemplate.opsForZSet()
+            .reverseRange(RANKING_KEY_PREFIX, 0, topN - 1);
 
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-        Map<String, Double> scoreMap = new HashMap<>();
-
-        for (int i = 0; i < RANKTIME; i++) {
-            String key = getMinuteKey(LocalDateTime.now().minusMinutes(i));
-            Set<ZSetOperations.TypedTuple<String>> tuples = zSetOps.reverseRangeWithScores(key, 0,
-                -1);
-
-            if (tuples == null) {
-                continue;
-            }
-
-            for (ZSetOperations.TypedTuple<String> tuple : tuples) {
-                scoreMap.merge(tuple.getValue(), tuple.getScore(), Double::sum);
-            }
-        }
-
-        List<String> result =scoreMap.entrySet().stream()
-            .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-            .limit(topN)
-            .map(Map.Entry::getKey)
-            .toList();;
-
-        return result;
+        if (result == null) return List.of();
+        return new ArrayList<>(result);
     }
 
     @KafkaListener(topics = "search-log", groupId = "search-log-group")
     public void consume(String keyword) {
-
-        String key = getMinuteKey(LocalDateTime.now());
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
-
-        zSetOps.incrementScore(key, keyword, 1.0);
-        redisTemplate.expire(key, java.time.Duration.ofMinutes(RANKTIME)); // TTL 설정 (5분)
+        zSetOps.incrementScore(RANKING_KEY_PREFIX, keyword, 1.0);
     }
 
-    private String getMinuteKey(LocalDateTime time) {
+    @Scheduled(fixedRate = 60_000)
+    public void decaySearchScores() {
+        String key = RANKING_KEY_PREFIX;
+        double decayFactor = 0.9;
 
-        return RANKING_KEY_PREFIX + time.format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+        Set<ZSetOperations.TypedTuple<String>> tuples =
+            redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
+
+        if (tuples == null) return;
+
+        for (ZSetOperations.TypedTuple<String> tuple : tuples) {
+            String keyword = tuple.getValue();
+            Double score = tuple.getScore();
+            if (keyword == null || score == null) continue;
+
+            double newScore = score * decayFactor;
+
+            if (newScore < 0.01) {
+                redisTemplate.opsForZSet().remove(key, keyword);
+            } else {
+                redisTemplate.opsForZSet().add(key, keyword, newScore);
+            }
+        }
+
+        redisTemplate.opsForZSet().removeRange(key, 1000, -1);
     }
+
+
 }
