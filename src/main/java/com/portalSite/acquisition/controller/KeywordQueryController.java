@@ -21,6 +21,7 @@ public class KeywordQueryController {
     private final KafkaStreamsInteractiveQueryService queryService;
 
 
+
     @GetMapping("/top-keywords")
     public List<KeywordScore> topKeyword() {
         ReadOnlyKeyValueStore<String, Long> store = queryService.retrieveQueryableStore("keyword-score-store", QueryableStoreTypes.keyValueStore());
