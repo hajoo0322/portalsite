@@ -9,6 +9,7 @@ import com.portalSite.cafe.repository.CafeLevelRepository;
 import com.portalSite.cafe.repository.CafeMemberRepository;
 import com.portalSite.cafe.repository.CafeRepository;
 import com.portalSite.common.exception.core.DuplicateNameException;
+import com.portalSite.common.exception.core.NotFoundException;
 import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
@@ -36,9 +37,9 @@ public class CafeMemberService {
         if (cafeMemberRepository.existsByNickname(cafeMemberRequest.nickname())) {
             throw new DuplicateNameException(ErrorCode.DUPLICATE_NAME);
         }
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
-        CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        CafeLevel firstCafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderAsc(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_LEVEL_NOT_FOUND));
         CafeMember cafeMember = CafeMember.of(cafe, member, firstCafeLevel, cafeMemberRequest.nickname());
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
         return CafeMemberResponse.from(savedCafeMember);
@@ -46,7 +47,7 @@ public class CafeMemberService {
 
     @Transactional(readOnly = true)
     public CafeMemberResponse getCafeMember(Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_MEMBER_NOT_FOUND));
         return CafeMemberResponse.from(cafeMember);
     }
 
@@ -57,7 +58,7 @@ public class CafeMemberService {
 
     @Transactional
     public CafeMemberResponse updateCafeMember(CafeMemberRequest cafeMemberRequest, Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_MEMBER_NOT_FOUND));
         cafeMember.update(cafeMemberRequest);
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
         return CafeMemberResponse.from(savedCafeMember);
@@ -65,7 +66,7 @@ public class CafeMemberService {
 
     @Transactional
     public void deleteCafeMember(Long memberId, Long cafeId) {
-        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new RuntimeException(""));
+        CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_MEMBER_NOT_FOUND));
         cafeMember.delete(true);
     }
 
@@ -105,9 +106,9 @@ public class CafeMemberService {
 
     @Transactional
     public CafeMemberResponse addFirstCafeMember(Long memberId, Long cafeId, CafeMemberRequest cafeMemberRequest) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException(""));
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
-        CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
+        CafeLevel cafeLevel = cafeLevelRepository.findFirstByCafeIdOrderByGradeOrderDesc(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_LEVEL_NOT_FOUND));
         CafeMember cafeMember = CafeMember.of(cafe, member, cafeLevel, cafeMemberRequest.nickname());
         CafeMember savedCafeMember = cafeMemberRepository.save(cafeMember);
         return CafeMemberResponse.from(savedCafeMember);

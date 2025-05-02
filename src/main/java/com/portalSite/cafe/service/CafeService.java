@@ -7,6 +7,7 @@ import com.portalSite.cafe.entity.CafeLevel;
 import com.portalSite.cafe.repository.CafeLevelRepository;
 import com.portalSite.cafe.repository.CafeRepository;
 import com.portalSite.common.exception.core.DuplicateNameException;
+import com.portalSite.common.exception.core.NotFoundException;
 import com.portalSite.common.exception.custom.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,13 +34,13 @@ public class CafeService{
 
     @Transactional(readOnly = true)
     public CafeResponse getCafe(Long cafeId) {
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
         return CafeResponse.from(cafe);
     }
 
     @Transactional
     public CafeResponse updateCafe(CafeRequest requestCafe, Long cafeId) {
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
         cafe.setCafeName(requestCafe.cafeName());
         cafe.setDescription(requestCafe.description());
         return CafeResponse.from(cafe);
@@ -47,7 +48,7 @@ public class CafeService{
 
     @Transactional
     public void deleteCafe(Long cafeId) {
-        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new RuntimeException(""));
+        Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
         List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeId(cafeId);
         cafeRepository.delete(cafe);
         cafeLevelRepository.deleteAll(cafeLevelList);
