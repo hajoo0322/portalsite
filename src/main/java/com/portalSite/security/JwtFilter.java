@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = jwtUtil.substringToken(bearerJwt);
             try {
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                    setAuthentication(token);
+                    setAuthentication(token,request);
                 }
             } catch (ExpiredJwtException e) {
                 errorResponseHandler.send(response, HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다.");
@@ -80,7 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
     /**
      * Context 에 인증정보 저장
      */
-    private void setAuthentication(String token) {
+    private void setAuthentication(String token, HttpServletRequest request) {
         Claims claims = jwtUtil.extractClaims(token);
         String[] data = claims.getSubject().split(":");
         Long memberId = Long.valueOf(data[0]);
@@ -88,6 +88,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         AuthUser authUser = AuthUser.of(memberId, userRole);
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(authUser);
+        authenticationToken.setDetails(new ClientIp(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 }
