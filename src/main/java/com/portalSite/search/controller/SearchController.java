@@ -34,7 +34,7 @@ public class SearchController {
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요")String keyword,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
             ) {
-        keywordProducer.publishRawKeyword(keyword); //kafka로 검색어 publish
+        keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         SearchResponse response = searchService.search(keyword, pageable);
         return ResponseEntity.ok(response);
     }
