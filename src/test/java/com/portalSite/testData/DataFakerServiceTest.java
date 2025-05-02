@@ -12,9 +12,14 @@ import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.entity.NewsCategory;
 import com.portalSite.news.repository.NewsCategoryRepository;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -24,8 +29,10 @@ import java.sql.SQLException;
 
 import java.util.Locale;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-public class DataFakerService {
+public class DataFakerServiceTest {
+
     @Autowired
     CafePostRepository cafePostRepository;
     @Autowired
@@ -46,6 +53,14 @@ public class DataFakerService {
     BlogRepository blogRepository;
     @Autowired
     BlogBoardRepository blogBoardRepository;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @BeforeAll
+    void setupData() {
+        makeDefaultData();
+    }
 
     @Test
     void makeDefaultData(){ //기본 데이터가 하나도 없을 경우 꼭 먼저 실행해주세요.
@@ -81,12 +96,13 @@ public class DataFakerService {
         blogBoardRepository.save(blogBoard);
     }
 
+
     @Test
     void makeCafePostData() throws SQLException { //카페 게시글 생성
         Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/portalSite",
                 "root",
-                "password" //이곳에 password를 입력해주세요. ex) "1234"
+                password //이곳에 password를 입력해주세요. ex) "1234"
         );
        conn.setAutoCommit(false);
 
@@ -126,7 +142,7 @@ public class DataFakerService {
         Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/portalSite",
                 "root",
-                "password" //이곳에 password를 입력해주세요. ex) "1234"
+                password //이곳에 password를 입력해주세요. ex) "1234"
         );
         conn.setAutoCommit(false);
 
@@ -166,7 +182,7 @@ public class DataFakerService {
         Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/portalSite",
                 "root",
-                "password" //이곳에 password를 입력해주세요. ex) "1234"
+                password //이곳에 password를 입력해주세요. ex) "1234"
         );
         conn.setAutoCommit(false);
 
