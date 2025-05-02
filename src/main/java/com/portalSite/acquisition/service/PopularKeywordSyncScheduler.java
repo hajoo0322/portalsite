@@ -30,11 +30,6 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
     }
 
     private KafkaStreams waitForKafkaStreams(StreamsBuilderFactoryBean factoryBean) {
-        while (factoryBean.getKafkaStreams() == null) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignored) {}
-        }
         return factoryBean.getKafkaStreams();
     }
     @Scheduled(fixedDelay = 10000)

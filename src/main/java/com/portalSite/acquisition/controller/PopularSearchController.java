@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-public class SearchController {
+public class PopularSearchController {
 
     private final PublishLogService publishLogService;
 
