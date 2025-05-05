@@ -29,6 +29,13 @@ public enum ErrorCode {
     //like
 
     //news
+    NEWS_CATEGORY_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리입니다."),
+    PARENT_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상위 카테고리입니다."),
+    NEWS_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 뉴스입니다."),
+    AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 작성자입니다."),
+    NO_UPDATE_PERMISSION(HttpStatus.FORBIDDEN, "수정 권한이 없습니다."),
+    NO_DELETE_PERMISSION(HttpStatus.FORBIDDEN, "삭제 권한이 없습니다."),
 
     //member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 멤버입니다."),
