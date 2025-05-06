@@ -7,7 +7,6 @@ import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.entity.PostType;
 import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
-import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

@@ -1,10 +1,8 @@
 package com.portalSite.search.controller;
 
 import com.portalSite.comment.entity.PostType;
-import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import com.portalSite.search.service.SearchService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
