@@ -21,6 +21,11 @@ public class SearchService {
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
 
+    /**
+     * 검색 기준<br>
+     * 카페, 뉴스 : 제목, 내용
+     * 블로그 : 제목, 내용, 해시태그
+     */
     public SearchResponse search(String keyword, Pageable pageable, PostType postType) {
 
         List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
