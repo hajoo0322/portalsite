@@ -1,7 +1,9 @@
 package com.portalSite.blog.repository;
 
 import com.portalSite.blog.entity.BlogPost;
+import com.portalSite.blog.entity.QBlogHashtag;
 import com.portalSite.blog.entity.QBlogPost;
+import com.portalSite.blog.entity.QHashtag;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,22 +20,30 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom{
     @Override
     public Page<BlogPost> findAllByKeyword(String keyword, Pageable pageable) {
         QBlogPost blogPost = QBlogPost.blogPost;
+        QBlogHashtag blogHashtag = QBlogHashtag.blogHashtag;
+        QHashtag hashtag = QHashtag.hashtag;
 
         List<BlogPost> result = queryFactory
-                .selectFrom(blogPost)
+                .selectFrom(blogPost).distinct()
+                .join(blogPost.hashtagList, blogHashtag)
+                .join(blogHashtag.hashtag, hashtag)
                 .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword)))
+                        .or(blogPost.description.containsIgnoreCase(keyword))
+                        .or(hashtag.tag.containsIgnoreCase(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long title = queryFactory
-                .select(blogPost.count())
-                .from(blogPost)
+        Long count = (long) queryFactory
+                .select(blogPost).distinct()
+                .join(blogPost.hashtagList, blogHashtag)
+                .join(blogHashtag.hashtag, hashtag)
                 .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword)))
-                .fetchOne();
+                        .or(blogPost.description.containsIgnoreCase(keyword))
+                        .or(hashtag.tag.containsIgnoreCase(keyword)))
+                .fetch()
+                .size();
 
-        return new PageImpl<>(result, pageable, title != null ? title : 0);
+        return new PageImpl<>(result, pageable, count != null ? count : 0);
     }
 }
