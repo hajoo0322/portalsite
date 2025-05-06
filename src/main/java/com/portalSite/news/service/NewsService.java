@@ -1,5 +1,7 @@
 package com.portalSite.news.service;
 
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.dto.request.NewsCreateRequest;
@@ -26,12 +28,12 @@ public class NewsService {
     @Transactional
     public News createNews(NewsCreateRequest requestDto, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new RuntimeException() /*TODO 예외 처리 추가(존재하지 않는 작성자)*/
+                () -> new CustomException(ErrorCode.AUTHOR_NOT_FOUND)
         );
 
         NewsCategory newsCategory = newsCategoryRepository.findById(requestDto.categoryId())
                 .orElseThrow(
-                        () -> new RuntimeException() /*TODO 예외 처리 추가(존재하지 않는 카테고리)*/
+                        () -> new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND)
                 );
 
         News news = News.of(member, newsCategory, requestDto.newsTitle(), requestDto.description());
@@ -42,7 +44,7 @@ public class NewsService {
     @Transactional(readOnly = true)
     public News getNewsById(Long newsId) {
         return newsRepository.findById(newsId).orElseThrow(
-                () -> new RuntimeException() /*TODO 예외 처리: (잘못된 리소스, 기사가 존재하지 않음)*/
+                () -> new CustomException(ErrorCode.NEWS_NOT_FOUND)
         );
     }
 
@@ -54,17 +56,17 @@ public class NewsService {
     @Transactional
     public News updateNews(NewsRequest requestDto, Long newsId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new RuntimeException() /*TODO 예외 처리 추가(수정으로 요청한 사용자를 찾을 수 없음)*/
+                () ->new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
         News news = getNewsById(newsId);
         if (!memberId.equals(news.getMember().getId())) {
-            throw new RuntimeException(); /*TODO 예외처리: 뉴스 작성자와 수정 요청자가 다름(수정권한 없음)*/
+            throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
         }
 
         NewsCategory newsCategory = newsCategoryRepository.findById(requestDto.categoryId())
                 .orElseThrow(
-                        () -> new RuntimeException() /*TODO 예외 처리 추가(존재하지 않는 카테고리)*/
+                        () -> new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND)
                 );
 
         news.updateNews(newsCategory, requestDto.newsTitle(), requestDto.description());
@@ -76,7 +78,7 @@ public class NewsService {
     public void deleteNews(Long newsId, Long memberId) {
         News news = getNewsById(newsId);
         if (!memberId.equals(news.getMember().getId())) {
-            throw new RuntimeException(); /*TODO 예외처리: 뉴스 작성자와 삭제 요청자가 다름(삭제권한 없음)*/
+            throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
         }
 
         newsRepository.delete(news);

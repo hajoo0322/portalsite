@@ -1,5 +1,7 @@
 package com.portalSite.news.service;
 
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.news.dto.request.NewsCategoryRequest;
 import com.portalSite.news.dto.response.NewsCategoryListResponse;
 import com.portalSite.news.dto.response.NewsCategoryResponse;
@@ -22,13 +24,13 @@ public class NewsCategoryService {
     @Transactional
     public NewsCategoryResponse createCategory(@Valid NewsCategoryRequest request) {
         if (newsCategoryRepository.findByName(request.name()).isPresent()) {
-            throw new RuntimeException(); /*TODO 예외처리 (이미 존재하는 카테고리)*/
+            throw new CustomException(ErrorCode.NEWS_CATEGORY_ALREADY_EXIST);
         }
 
         NewsCategory parentCategory = null;
         if (null != request.parentId()) {
             parentCategory = newsCategoryRepository.findById(request.parentId()).orElseThrow(
-                    () -> new RuntimeException() /*TODO 예외처리 (상위 카테고리를 찾을 수 없음)*/
+                    () -> new CustomException(ErrorCode.PARENT_CATEGORY_NOT_FOUND)
             );
         }
 
@@ -38,7 +40,7 @@ public class NewsCategoryService {
     @Transactional(readOnly = true)
     public NewsCategoryListResponse getSubCategoriesByParentId(Long parentId) {
         if (!newsCategoryRepository.existsById(parentId)) {
-            throw new RuntimeException(); /*TODO 예외처리(존재하지 않는 카테고리)*/
+            throw new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND);
         }
 
         List<NewsCategoryResponse> newsList = newsCategoryRepository.findAllByParentId(parentId).stream()
@@ -54,13 +56,13 @@ public class NewsCategoryService {
     @Transactional
     public NewsCategory updateCategory(NewsCategoryRequest request, Long categoryId) {
         NewsCategory newsCategory = newsCategoryRepository.findById(categoryId).orElseThrow(
-                () -> new RuntimeException() /*TODO 예외처리(존재하지 않는 카테고리)*/
+                () -> new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND)
         );
 
         NewsCategory parentCategory = null;
         if (null != request.parentId()) {
             parentCategory = newsCategoryRepository.findById(request.parentId()).orElseThrow(
-                    () -> new RuntimeException() /*TODO 예외처리(상위 카테고리를 찾을 수 없음)*/
+                    () -> new CustomException(ErrorCode.PARENT_CATEGORY_NOT_FOUND)
             );
         }
 
@@ -72,7 +74,7 @@ public class NewsCategoryService {
     @Transactional
     public void deleteCategory(Long categoryId) {
         NewsCategory newsCategory = newsCategoryRepository.findById(categoryId).orElseThrow(
-                () -> new RuntimeException() /*TODO 예외처리(존재하지 않는 카테고리)*/
+                () -> new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND)
         );
 
         deleteSubcategories(categoryId);
