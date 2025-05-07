@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,19 +27,21 @@ public class SearchService {
      * 카페, 뉴스 : 제목, 내용
      * 블로그 : 제목, 내용, 해시태그
      */
-    public SearchResponse search(String keyword, Pageable pageable, PostType postType) {
+    public SearchResponse search(
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, boolean descending, PostType postType, Pageable pageable) {
 
         List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
-                blogPostRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(BlogPostResponse::from).toList() : null;
+                blogPostRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
+                        .stream().map(BlogPostResponse::from).toList() : null;
 
         List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
-                cafePostRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(CafePostResponse::from).toList() : null;
+                cafePostRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
+                        .stream().map(CafePostResponse::from).toList() : null;
 
         List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
-                newsRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(NewsResponse::from).toList() : null;
+                newsRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
+                        .stream().map(NewsResponse::from).toList() : null;
 
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }

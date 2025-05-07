@@ -11,6 +11,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
@@ -24,10 +26,15 @@ public class SearchController {
             @RequestParam("keyword")
             @NotBlank(message = "검색어를 입력해주세요")
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
+            @RequestParam(value = "writer") String writer,
+            @RequestParam(value = "created_at_start") LocalDateTime createdAtStart,
+            @RequestParam(value = "created_at_end") LocalDateTime createdAtEnd,
+            @RequestParam(value = "desc") boolean desc,
             @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
-        SearchResponse response = searchService.search(keyword, pageable, postType);
+        SearchResponse response = searchService.
+                search(keyword, writer, createdAtStart, createdAtEnd, desc, postType, pageable);
         return ResponseEntity.ok(response);
     }
 }
