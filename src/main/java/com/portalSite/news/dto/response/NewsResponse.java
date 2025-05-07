@@ -14,11 +14,13 @@ public record NewsResponse(
   public static NewsResponse from(News news){
     return new NewsResponse(
         news.getId(),
-        news.getMember().getName(), /*TODO MemberEntity 참고하여 필드명 수정*/
+        news.getMember().getName(),
         news.getNewsCategory().getId(),
         news.getNewsTitle(),
         news.getDescription(),
         news.getCreatedAt()
     );
   }
+
+
 }
