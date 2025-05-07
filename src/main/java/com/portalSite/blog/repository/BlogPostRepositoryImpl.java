@@ -25,24 +25,41 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom{
 
         List<BlogPost> result = queryFactory
                 .selectFrom(blogPost).distinct()
-                .join(blogPost.hashtagList, blogHashtag)
-                .join(blogHashtag.hashtag, hashtag)
                 .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword))
-                        .or(hashtag.tag.containsIgnoreCase(keyword)))
+                        .or(blogPost.description.containsIgnoreCase(keyword)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         Long count = (long) queryFactory
-                .select(blogPost).distinct()
-                .join(blogPost.hashtagList, blogHashtag)
-                .join(blogHashtag.hashtag, hashtag)
+                .selectFrom(blogPost).distinct()
                 .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword))
-                        .or(hashtag.tag.containsIgnoreCase(keyword)))
+                        .or(blogPost.description.containsIgnoreCase(keyword)))
                 .fetch()
                 .size();
+
+//        List<BlogPost> result = queryFactory
+//                .select(blogHashtag.post).distinct()
+//                .from(blogHashtag)
+//                .leftJoin(blogHashtag.post, blogPost)
+//                .leftJoin(blogHashtag.hashtag, hashtag)
+//                .where(blogPost.title.containsIgnoreCase(keyword)
+//                        .or(blogPost.description.containsIgnoreCase(keyword))
+//                        .or(hashtag.tag.containsIgnoreCase(keyword)))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        Long count = (long) queryFactory
+//                .select(blogHashtag.post)
+//                .from(blogHashtag)
+//                .leftJoin(blogHashtag.post, blogPost)
+//                .leftJoin(blogHashtag.hashtag, hashtag)
+//                .where(blogPost.title.containsIgnoreCase(keyword)
+//                        .or(blogPost.description.containsIgnoreCase(keyword))
+//                        .or(hashtag.tag.containsIgnoreCase(keyword)))
+//                .fetch()
+//                .size();
 
         return new PageImpl<>(result, pageable, count != null ? count : 0);
     }
