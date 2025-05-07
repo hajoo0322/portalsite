@@ -26,9 +26,9 @@ public class SearchController {
             @RequestParam("keyword")
             @NotBlank(message = "검색어를 입력해주세요")
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
-            @RequestParam(value = "writer") String writer,
-            @RequestParam(value = "created_at_start") LocalDateTime createdAtStart,
-            @RequestParam(value = "created_at_end") LocalDateTime createdAtEnd,
+            @RequestParam(value = "writer", required = false) String writer,
+            @RequestParam(value = "created_at_start", required = false) LocalDateTime createdAtStart,
+            @RequestParam(value = "created_at_end", required = false) LocalDateTime createdAtEnd,
             @RequestParam(value = "desc", defaultValue = "true") boolean desc,
             @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
