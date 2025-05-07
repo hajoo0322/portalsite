@@ -41,6 +41,19 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/v2")
+    public ResponseEntity<SearchResponse> searchV2(
+            @RequestParam("keyword")
+            @NotBlank(message = "검색어를 입력해주세요")
+            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
+            @RequestParam(value = "postType", required = false) PostType postType,
+            @PageableDefault(sort = "id", direction = DESC) Pageable pageable
+    ) {
+        keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
+        SearchResponse response = searchService.searchV2(keyword, pageable, postType);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/top-keywords")
     public ResponseEntity<List<TopKeywordsResponse>> getKeywordRanking(){
         //아래 linkedHashSet은 삽입 순서 유지

@@ -38,4 +38,18 @@ public class SearchService {
 
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }
+
+    public SearchResponse searchV2(String keyword, Pageable pageable, PostType postType) {
+
+        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
+                blogPostRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+
+        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
+                cafePostRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+
+        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
+                newsRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+
+        return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
+    }
 }
