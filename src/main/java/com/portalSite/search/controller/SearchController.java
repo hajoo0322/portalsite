@@ -29,7 +29,7 @@ public class SearchController {
             @RequestParam(value = "writer") String writer,
             @RequestParam(value = "created_at_start") LocalDateTime createdAtStart,
             @RequestParam(value = "created_at_end") LocalDateTime createdAtEnd,
-            @RequestParam(value = "desc") boolean desc,
+            @RequestParam(value = "desc", defaultValue = "true") boolean desc,
             @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
