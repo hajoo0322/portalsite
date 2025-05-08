@@ -20,7 +20,6 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
             String keyword, String writer,
             LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
             boolean descending, Pageable pageable) {
-        int index;
 
         StringBuilder sql = new StringBuilder(
                 "SELECT bp.id, bp.member_id, bp.blog_board_id, bp.title, bp.description " +
@@ -28,21 +27,19 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
                 "JOIN member m ON bp.member_id = m.member_id " +
                 "WHERE (bp.title LIKE ?1 OR bp.description LIKE ?1)");
 
-        index = appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
+        appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
         if (descending) {
             sql.append(" ORDER BY bp.created_at DESC");
         }
 
-        sql.append(" LIMIT ?").append(++index).append(" OFFSET ?").append(++index);
+        sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
 
         Query query = entityManager.createNativeQuery(sql.toString());
-        index = setParams(query, keyword, writer, createdAtStart, createdAtEnd);
+        setParams(query, keyword, writer, createdAtStart, createdAtEnd);
 
         @SuppressWarnings("unchecked")
         List<Object[]> rows = query
-                .setParameter(++index, pageable.getPageSize())
-                .setParameter(++index, pageable.getOffset())
                 .getResultList();
 
         List<BlogPostResponse> content = rows
@@ -110,7 +107,7 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private int appendSearchCondition(
+    private void appendSearchCondition(
             StringBuilder sql, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
         int index = 1;
 
@@ -123,11 +120,9 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
         if (createdAtEnd != null) {
             sql.append(" AND bp.created_at <= ?").append(++index);
         }
-
-        return index;
     }
 
-    private int setParams(
+    private void setParams(
             Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
         int index = 0;
 
@@ -142,7 +137,5 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
         if (createdAtEnd != null) {
             query.setParameter(++index, createdAtEnd);
         }
-
-        return index;
     }
 }
