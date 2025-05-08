@@ -3,6 +3,7 @@ package com.portalSite.acquisition.service;
 import com.portalSite.acquisition.dto.kafkaDto.AutocompleteSuggestionResponse;
 import com.portalSite.acquisition.dto.kafkaDto.KeywordScore;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsMetadata;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,7 +26,7 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
     private final RedisTemplate<String, String> redisTemplate;
     private final WebClient.Builder webclientBuilder;
 
-    private  KafkaStreams kafkaStreams;
+    private KafkaStreams kafkaStreams;
 
     @Override
     public void afterPropertiesSet() {
@@ -39,7 +40,7 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
     public void syncTopKeywordToRedis() {
 
         Collection<StreamsMetadata> metadataList = kafkaStreams.streamsMetadataForStore("keyword-score-store");
-        PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingLong(KeywordScore::score));
+        PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingDouble(KeywordScore::score));
         List<Mono<List<KeywordScore>>> calls = new ArrayList<>();
 
         for (StreamsMetadata metadata : metadataList) {
@@ -65,7 +66,7 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
                 })
                 .doOnComplete(() -> {
                     List<KeywordScore> top10 = new ArrayList<>(heap);
-                    top10.sort((a, b) -> Long.compare(b.score(), a.score()));
+                    top10.sort((a, b) -> Double.compare(b.score(), a.score()));
 
                     redisTemplate.delete("popular:keywords");
                     for (KeywordScore ks : top10) {

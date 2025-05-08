@@ -21,10 +21,10 @@ public class KeywordQueryController {
 
     @GetMapping("/top-keywords")
     public List<KeywordScore> topKeyword() {
-        ReadOnlyKeyValueStore<String, Long> store = queryService.retrieveQueryableStore("keyword-score-store", QueryableStoreTypes.keyValueStore());
-        PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingLong(KeywordScore::score));
+        ReadOnlyKeyValueStore<String, Double> store = queryService.retrieveQueryableStore("keyword-score-store", QueryableStoreTypes.keyValueStore());
+        PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingDouble(KeywordScore::score));
 
-        try (KeyValueIterator<String, Long> all = store.all()) {
+        try (KeyValueIterator<String, Double> all = store.all()) {
             while (all.hasNext()) {
                 var entry = all.next();
                 heap.offer(new KeywordScore(entry.key, entry.value));
@@ -33,7 +33,7 @@ public class KeywordQueryController {
         }
 
         List<KeywordScore> top10 = new ArrayList<>(heap);
-        top10.sort((a, b) -> Long.compare(b.score(), a.score()));
+        top10.sort((a, b) -> Double.compare(b.score(), a.score()));
         return top10;
     }
 
