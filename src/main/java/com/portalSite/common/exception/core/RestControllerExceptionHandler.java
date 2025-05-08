@@ -3,20 +3,26 @@ package com.portalSite.common.exception.core;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -112,6 +118,22 @@ public class RestControllerExceptionHandler {
 
         String errorMessage = globalErrorMessage + fieldErrorMessage;
         errorResponseHandler.send(response, HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    // 컨트롤러 파라미터의 제약 애너테이션 에러
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<?> handleValidationException(HandlerMethodValidationException ex) {
+        List<String> messages = ex.getParameterValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream()) // 검증 실패 애너테이션 목록
+                .map(MessageSourceResolvable::getDefaultMessage) // 애너테이션 메세지 추출
+                .filter(Objects::nonNull)
+                .toList();
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", 400,
+                "error", "Bad Request",
+                "message", messages
+        ));
     }
 
     // 500 서버에러
