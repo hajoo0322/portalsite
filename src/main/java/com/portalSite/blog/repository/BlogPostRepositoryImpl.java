@@ -23,9 +23,8 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT bp.id, bp.member_id, bp.blog_board_id, bp.title, bp.description " +
-                "FROM blog_post bp " +
-                "JOIN member m ON bp.member_id = m.member_id " +
-                "WHERE (bp.title LIKE ?1 OR bp.description LIKE ?1)");
+                        "FROM blog_post bp JOIN member m ON bp.member_id = m.member_id " +
+                        "WHERE (bp.title LIKE ?1 OR bp.description LIKE ?1)");
 
         appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
@@ -39,8 +38,7 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
         setParams(query, keyword, writer, createdAtStart, createdAtEnd);
 
         @SuppressWarnings("unchecked")
-        List<Object[]> rows = query
-                .getResultList();
+        List<Object[]> rows = query.getResultList();
 
         List<BlogPostResponse> content = rows
                 .stream()
@@ -56,16 +54,14 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
                 .toList();
 
         StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
-                "FROM blog_post bp " +
-                "JOIN member m ON bp.member_id = m.member_id " +
+                "FROM blog_post bp JOIN member m ON bp.member_id = m.member_id " +
                 "WHERE (bp.title LIKE ?1 OR bp.description LIKE ?1)");
 
         appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
         setParams(countQuery, keyword, writer, createdAtStart, createdAtEnd);
 
-        long total = ((Number) countQuery
-                .getSingleResult()).longValue();
+        long total = ((Number) countQuery.getSingleResult()).longValue();
 
         return new PageImpl<>(content, pageable, total);
     }
@@ -128,7 +124,7 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
 
         query.setParameter(++index, "%" + keyword + "%");
 
-        if (writer!= null && !writer.isBlank()) {
+        if (writer != null && !writer.isBlank()) {
             query.setParameter(++index, "%" + writer + "%");
         }
         if (createdAtStart != null) {

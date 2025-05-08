@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class NewsRepositoryImpl implements NewsRepositoryCustom{
+public class NewsRepositoryImpl implements NewsRepositoryCustom {
     private final EntityManager entityManager;
 
     @Override
@@ -24,8 +24,8 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom{
 
         StringBuilder sql = new StringBuilder(
                 "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
-                "FROM news n JOIN member m on n.member_id = m.member_id " +
-                "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
+                        "FROM news n JOIN member m on n.member_id = m.member_id " +
+                        "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
 
         appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
@@ -128,7 +128,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom{
 
         query.setParameter(++index, "%" + keyword + "%");
 
-        if (writer!= null && !writer.isBlank()) {
+        if (writer != null && !writer.isBlank()) {
             query.setParameter(++index, "%" + writer + "%");
         }
         if (createdAtStart != null) {

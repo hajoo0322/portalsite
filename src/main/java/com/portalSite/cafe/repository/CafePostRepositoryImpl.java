@@ -1,11 +1,6 @@
 package com.portalSite.cafe.repository;
 
 import com.portalSite.cafe.dto.CafePostResponse;
-import com.portalSite.cafe.entity.CafePost;
-import com.portalSite.cafe.entity.QCafePost;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +9,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.math.BigInteger;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
-    private final JPAQueryFactory queryFactory;
-
     private final EntityManager entityManager;
 
     @Override
@@ -31,8 +23,8 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
-                "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
-                "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
+                        "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
+                        "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
 
         appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
@@ -46,8 +38,7 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
         setParams(query, keyword, writer, createdAtStart, createdAtEnd);
 
         @SuppressWarnings("unchecked")
-        List<Object[]> rows = query
-                .getResultList();
+        List<Object[]> rows = query.getResultList();
 
         List<CafePostResponse> content = rows
                 .stream()
@@ -63,10 +54,9 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
                 })
                 .toList();
 
-        StringBuilder countSql = new StringBuilder(
-                "SELECT COUNT(*) " +
-                "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
-                "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
+        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
+                        "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
+                        "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
 
         appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
@@ -79,7 +69,7 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
 
     @Override
     public Page<CafePostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
-        String sql ="SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
+        String sql = "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
                 "FROM cafe_post cp JOIN cafe_member cm ON cm.id=cp.cafe_member_id " +
                 "WHERE MATCH(title, description) AGAINST(?1 IN BOOLEAN MODE) " +
                 "LIMIT ?2 OFFSET ?3";
