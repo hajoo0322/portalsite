@@ -14,6 +14,7 @@ import com.portalSite.news.repository.NewsRepository;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,8 +50,8 @@ public class NewsService {
     }
 
     @Transactional(readOnly = true)
-    public List<News> getNewsListByCategory(Long categoryId) {
-        return newsRepository.findAllByNewsCategoryId(categoryId);
+    public List<News> getNewsListByCategory(Long categoryId, Pageable pageable) {
+        return newsRepository.findAllByNewsCategoryId(categoryId, pageable);
     }
 
     @Transactional
