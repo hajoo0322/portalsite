@@ -40,9 +40,9 @@ public class SearchService {
                 keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
         List<CafePostResponse> cafePostList = cafePostPage.getContent();
 
-        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
-                newsRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
-                        .stream().map(NewsResponse::from).toList() : null;
+        Page<NewsResponse> newsPage = newsRepository.findAllByKeywordV2(
+                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
+        List<NewsResponse> newsList = newsPage.getContent();
 
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }

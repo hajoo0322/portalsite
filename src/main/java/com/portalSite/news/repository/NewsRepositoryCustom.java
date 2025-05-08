@@ -13,5 +13,9 @@ public interface NewsRepositoryCustom {
                                 LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
                                 boolean descending, Pageable pageable);
 
+    Page<NewsResponse> findAllByKeywordV2(String keyword, String writer,
+                                              LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
+                                              boolean descending, Pageable pageable);
+
     Page<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
 }

@@ -7,22 +7,21 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class NewsRepositoryImpl implements NewsRepositoryCustom{
-
     private final JPAQueryFactory queryFactory;
-    private final EntityManager entityManager;
 
+    private final EntityManager entityManager;
     @Override
     public Page<News> findAllByKeyword(
             String keyword, String writer,
@@ -72,6 +71,58 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom{
     }
 
     @Override
+    public Page<NewsResponse> findAllByKeywordV2(
+            String keyword, String writer,
+            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
+            boolean descending, Pageable pageable) {
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
+                "FROM news n JOIN member m on n.member_id = m.member_id " +
+                "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
+
+        appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
+
+        if (descending) {
+            sql.append(" ORDER BY n.created_at DESC");
+        }
+
+        sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        setParams(query, keyword, writer, createdAtStart, createdAtEnd);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        List<NewsResponse> content = rows
+                .stream()
+                .map(row -> {
+                    return new NewsResponse(
+                            ((Long) ((Object[]) row)[0]),          // id
+                            (String) ((Object[]) row)[1],          // name
+                            ((Long) ((Object[]) row)[2]),          // news_category_id
+                            (String) ((Object[]) row)[3],          // title
+                            (String) ((Object[]) row)[4],          // description
+                            ((Timestamp) ((Object[]) row)[5]).toLocalDateTime()  // created_at
+                    );
+                })
+                .toList();
+
+        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
+                "FROM news n JOIN member m on n.member_id = m.member_id " +
+                "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
+
+        appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
+        Query countQuery = entityManager.createNativeQuery(countSql.toString());
+        setParams(countQuery, keyword, writer, createdAtStart, createdAtEnd);
+
+        long total = ((Number) query.getSingleResult()).longValue();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
     public Page<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
         String sql = "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
                 "FROM news n JOIN member m ON m.member_id=n.member_id " +
@@ -107,5 +158,38 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom{
                 .getSingleResult());
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private void appendSearchCondition(
+            StringBuilder sql, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 1;
+
+        if (writer != null && !writer.isBlank()) {
+            sql.append(" AND m.name LIKE ?").append(++index);
+        }
+        if (createdAtStart != null) {
+            sql.append(" AND n.created_at >= ?").append(++index);
+        }
+        if (createdAtEnd != null) {
+            sql.append(" AND n.created_at <= ?").append(++index);
+        }
+    }
+
+
+    private void setParams(
+            Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 0;
+
+        query.setParameter(++index, "%" + keyword + "%");
+
+        if (writer!= null && !writer.isBlank()) {
+            query.setParameter(++index, "%" + writer + "%");
+        }
+        if (createdAtStart != null) {
+            query.setParameter(++index, createdAtStart);
+        }
+        if (createdAtEnd != null) {
+            query.setParameter(++index, createdAtEnd);
+        }
     }
 }
