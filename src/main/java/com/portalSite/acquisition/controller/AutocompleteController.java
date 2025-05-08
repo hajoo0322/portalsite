@@ -24,7 +24,7 @@ public class AutocompleteController {
             @CurrentClientIp String clientIp
     ) {
 
-
+        publishLogService.sendAutocompleteClickEvent(autocompleteClickRequest, clientIp);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

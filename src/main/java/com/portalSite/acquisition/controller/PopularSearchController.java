@@ -24,13 +24,16 @@ public class PopularSearchController {
             @RequestBody SearchClickRequest searchClickRequest,
             @CurrentClientIp String clientIp
     ) {
-        publishLogService.sendClickEvent(searchClickRequest,clientIp);
+        publishLogService.sendSearchClickEvent(searchClickRequest,clientIp);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/dwell")
-    public ResponseEntity<Void> logDwell(@RequestBody SearchDwellRequest searchDwellRequest) {
-
+    public ResponseEntity<Void> logDwell(
+            @RequestBody SearchDwellRequest searchDwellRequest,
+            @CurrentClientIp String clientIp
+    ) {
+        publishLogService.sendDwellEvent(searchDwellRequest, clientIp);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

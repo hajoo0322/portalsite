@@ -19,6 +19,21 @@ public class KafkaConfig {
     }
 
     @Bean
+    public NewTopic autocompleteTopic() {
+        return TopicBuilder.name("Autocomplete-events")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+    @Bean
+    public NewTopic popularSearchTopic() {
+        return TopicBuilder.name("popular-search-events")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
     public KafkaStreamsInteractiveQueryService kafkaStreamsInteractiveQueryService(StreamsBuilderFactoryBean streamsBuilderFactoryBean) {
         return new KafkaStreamsInteractiveQueryService(streamsBuilderFactoryBean);
     }
