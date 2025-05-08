@@ -9,6 +9,7 @@ import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +32,9 @@ public class SearchService {
             String keyword, String writer, LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd, boolean descending, PostType postType, Pageable pageable) {
 
-        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
-                blogPostRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
-                        .stream().map(BlogPostResponse::from).toList() : null;
+        Page<BlogPostResponse> page = blogPostRepository.findAllByKeywordV2(
+                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
+        List<BlogPostResponse> blogPostList = page.getContent();
 
         List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
                 cafePostRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)

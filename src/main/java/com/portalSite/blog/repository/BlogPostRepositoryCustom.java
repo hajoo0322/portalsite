@@ -13,5 +13,9 @@ public interface BlogPostRepositoryCustom {
                                     LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
                                     boolean descending, Pageable pageable);
 
+    Page<BlogPostResponse> findAllByKeywordV2(String keyword, String writer,
+                                            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
+                                            boolean descending, Pageable pageable);
+
     Page<BlogPostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
 }
