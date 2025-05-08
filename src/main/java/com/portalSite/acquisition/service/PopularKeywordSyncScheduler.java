@@ -1,9 +1,12 @@
 package com.portalSite.acquisition.service;
 
+import com.portalSite.acquisition.dto.kafkaDto.AutocompleteSuggestionResponse;
+import com.portalSite.acquisition.dto.kafkaDto.KeywordScore;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsMetadata;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -72,5 +75,39 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
                 .subscribe();
     }
 
-    public record KeywordScore(String keyword, long score) {}
+    @Scheduled(cron = "0 0 4 * * *")
+    public void syncAutocompleteToRedis() {
+        Collection<StreamsMetadata> metadataList =
+                kafkaStreams.streamsMetadataForStore("autocomplete-score-store");
+
+        List<Mono<Map<String, List<AutocompleteSuggestionResponse>>>> calls = new ArrayList<>();
+
+        for (StreamsMetadata metadata : metadataList) {
+            String baseUrl = "http://" + metadata.host() + ":" + metadata.port();
+            Mono<Map<String, List<AutocompleteSuggestionResponse>>> response = webclientBuilder.build()
+                    .get()
+                    .uri(baseUrl + "/top-autocomplete")
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, List<AutocompleteSuggestionResponse>>>() {})
+                    .onErrorResume(e -> {
+                        System.err.println("요청 실패: " + baseUrl);
+                        return Mono.empty();
+                    });
+            calls.add(response);
+        }
+
+        Flux.merge(calls)
+                .doOnNext(responseMap -> {
+                    for (Map.Entry<String, List<AutocompleteSuggestionResponse>> entry : responseMap.entrySet()) {
+                        String keyword = entry.getKey();
+                        List<AutocompleteSuggestionResponse> suggestions = entry.getValue();
+
+                        redisTemplate.delete("autocomplete:" + keyword);
+                        for (AutocompleteSuggestionResponse suggestion : suggestions) {
+                            redisTemplate.opsForZSet().add("autocomplete:" + keyword, suggestion.suggestion(), suggestion.score());
+                        }
+                    }
+                })
+                .subscribe();
+    }
 }

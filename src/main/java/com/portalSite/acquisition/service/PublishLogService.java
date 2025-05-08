@@ -1,9 +1,11 @@
 package com.portalSite.acquisition.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.portalSite.acquisition.dto.kafkaDto.KafkaSearchClickRequest;
+import com.portalSite.acquisition.dto.kafkaDto.AutocompleteEvent;
+import com.portalSite.acquisition.dto.kafkaDto.PopularSearchEvent;
+import com.portalSite.acquisition.dto.request.AutocompleteClickRequest;
 import com.portalSite.acquisition.dto.request.SearchClickRequest;
+import com.portalSite.acquisition.dto.request.SearchDwellRequest;
+import com.portalSite.common.infra.JsonHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -13,17 +15,26 @@ import org.springframework.stereotype.Service;
 public class PublishLogService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonHelper jsonHelper;
 
-    private static final String TOPIC = "popular-search-events";
+    private static final String POPULAR_SEARCH_EVENTS = "popular-search-events";
+    private static final String AUTOCOMPLETE_EVENTS = "Autocomplete-events";
 
-    public void sendClickEvent(SearchClickRequest searchClickRequest, String clientIp) {
-        KafkaSearchClickRequest kafkaSearchClickRequest = KafkaSearchClickRequest.of(searchClickRequest, clientIp);
-        try {
-            String payload = objectMapper.writeValueAsString(kafkaSearchClickRequest);
-            kafkaTemplate.send(TOPIC, searchClickRequest.keyword(), payload);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public void sendSearchClickEvent(SearchClickRequest searchClickRequest, String clientIp) {
+        PopularSearchEvent popularSearchEvent = PopularSearchEvent.of(searchClickRequest, clientIp);
+            String payload = jsonHelper.toJson(popularSearchEvent);
+            kafkaTemplate.send(POPULAR_SEARCH_EVENTS, searchClickRequest.keyword(), payload);
+    }
+
+    public void sendAutocompleteClickEvent(AutocompleteClickRequest autocompleteClickRequest, String clientIp) {
+        AutocompleteEvent autocompleteEvent = AutocompleteEvent.of(autocompleteClickRequest, clientIp);
+        String payload = jsonHelper.toJson(autocompleteEvent);
+        kafkaTemplate.send(AUTOCOMPLETE_EVENTS, autocompleteEvent.keyword(), payload);
+    }
+
+    public void sendDwellEvent(SearchDwellRequest searchDwellRequest, String clientIp) {
+        PopularSearchEvent popularSearchEvent = PopularSearchEvent.of(searchDwellRequest, clientIp);
+        String payload = jsonHelper.toJson(popularSearchEvent);
+        kafkaTemplate.send(POPULAR_SEARCH_EVENTS, searchDwellRequest.keyword(), payload);
     }
 }
