@@ -63,7 +63,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
         setParams(countQuery, keyword, writer, createdAtStart, createdAtEnd);
 
-        long total = ((Number) query.getSingleResult()).longValue();
+        long total = ((Number) countQuery.getSingleResult()).longValue();
 
         return new PageImpl<>(content, pageable, total);
     }
