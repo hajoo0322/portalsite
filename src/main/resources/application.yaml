@@ -23,4 +23,4 @@
 #spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
 #
 #  ##kstream
-#spring.kafka.streams.state-dir=C:/Users/su992/Documents/kafka-state
+#spring.kafka.streams.state-dir=디렉토리 주소 입력 ex)C:/Users/su992/Documents/kafka-state
