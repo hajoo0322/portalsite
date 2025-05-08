@@ -38,7 +38,6 @@ public class NewsCategoryController {
   }
 
   @GetMapping("/{categoryId}/subcategories")
-  @Secured(MemberRole.Authority.ADMIN)
   public ResponseEntity<NewsCategoryListResponse> getSubCategoriesByParentId(
       @PathVariable Long categoryId
   ) {

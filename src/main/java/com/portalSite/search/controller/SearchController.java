@@ -1,6 +1,8 @@
 package com.portalSite.search.controller;
 
 import com.portalSite.comment.entity.PostType;
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.kafka.KeywordProducer;
 import com.portalSite.search.dto.response.SearchResponse;
 import com.portalSite.search.dto.response.TopKeywordsResponse;
@@ -60,7 +62,7 @@ public class SearchController {
         Set<String> result = redisTemplate.opsForZSet().reverseRange("popular:keywords", 0, 9);
 
         if(result == null || result.isEmpty()) {
-            throw new RuntimeException(); /*TODO notfound 예외처리*/
+            throw new CustomException(ErrorCode.TOP_KEYWORDS_NOT_FOUND);
         }
 
         List<TopKeywordsResponse> responseList = new ArrayList<>();
