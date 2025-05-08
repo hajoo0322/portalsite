@@ -25,20 +25,20 @@ public class SearchService {
 
     /**
      * 검색 기준<br>
-     * 카페, 뉴스 : 제목, 내용
-     * 블로그 : 제목, 내용, 해시태그
+     * 카페, 뉴스 : 제목, 내용<br>
+     * 블로그 : 제목, 내용
      */
     public SearchResponse search(
             String keyword, String writer, LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd, boolean descending, PostType postType, Pageable pageable) {
 
-        Page<BlogPostResponse> page = blogPostRepository.findAllByKeywordV2(
+        Page<BlogPostResponse> blogPostPage = blogPostRepository.findAllByKeywordV2(
                 keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
-        List<BlogPostResponse> blogPostList = page.getContent();
+        List<BlogPostResponse> blogPostList = blogPostPage.getContent();
 
-        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
-                cafePostRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
-                        .stream().map(CafePostResponse::from).toList() : null;
+        Page<CafePostResponse> cafePostPage = cafePostRepository.findAllByKeywordV2(
+                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
+        List<CafePostResponse> cafePostList = cafePostPage.getContent();
 
         List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
                 newsRepository.findAllByKeyword(keyword, writer, createdAtStart, createdAtEnd, descending, pageable)
