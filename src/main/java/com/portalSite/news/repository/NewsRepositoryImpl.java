@@ -25,13 +25,9 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
         StringBuilder sql = new StringBuilder(
                 "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
                         "FROM news n JOIN member m on n.member_id = m.member_id " +
-                        "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
+                        "WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE)");
 
         appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
-
-        if (descending) {
-            sql.append(" ORDER BY n.created_at DESC");
-        }
 
         sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
 
@@ -57,7 +53,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
 
         StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
                 "FROM news n JOIN member m on n.member_id = m.member_id " +
-                "WHERE (n.news_title LIKE ?1 OR n.description LIKE ?1)");
+                "WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE)");
 
         appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
@@ -111,7 +107,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
         int index = 1;
 
         if (writer != null && !writer.isBlank()) {
-            sql.append(" AND m.name LIKE ?").append(++index);
+            sql.append(" AND MATCH(m.name) AGAINST (?").append(++index).append(" IN BOOLEAN MODE) ");
         }
         if (createdAtStart != null) {
             sql.append(" AND n.created_at >= ?").append(++index);
@@ -126,10 +122,10 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
             Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
         int index = 0;
 
-        query.setParameter(++index, "%" + keyword + "%");
+        query.setParameter(++index, keyword + "*");
 
         if (writer != null && !writer.isBlank()) {
-            query.setParameter(++index, "%" + writer + "%");
+            query.setParameter(++index, writer + "*");
         }
         if (createdAtStart != null) {
             query.setParameter(++index, createdAtStart);

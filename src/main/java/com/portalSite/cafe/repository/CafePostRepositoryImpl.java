@@ -24,13 +24,9 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
         StringBuilder sql = new StringBuilder(
                 "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
                         "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
-                        "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
+                        "WHERE MATCH(cp.title, cp.description) AGAINST (?1 IN BOOLEAN MODE)");
 
         appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
-
-        if (descending) {
-            sql.append(" ORDER BY cp.created_at DESC");
-        }
 
         sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
 
@@ -55,8 +51,8 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
                 .toList();
 
         StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
-                        "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
-                        "WHERE (cp.title LIKE ?1 OR cp.description LIKE ?1)");
+                "FROM cafe_post cp JOIN cafe_member cm ON cp.cafe_member_id = cm.id " +
+                "WHERE MATCH(cp.title, cp.description) AGAINST (?1 IN BOOLEAN MODE)");
 
         appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
@@ -110,13 +106,13 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
         int index = 1;
 
         if (writer != null && !writer.isBlank()) {
-            sql.append(" AND cm.nickname LIKE ?").append(++index);
+            sql.append(" AND MATCH(cm.nickname) AGAINST (?").append(++index).append(" IN BOOLEAN MODE) ");
         }
         if (createdAtStart != null) {
-            sql.append(" AND cp.createdAt >= ?").append(++index);
+            sql.append(" AND cp.created_at >= ?").append(++index);
         }
         if (createdAtEnd != null) {
-            sql.append(" AND cp.createdAt <= ?").append(++index);
+            sql.append(" AND cp.created_at <= ?").append(++index);
         }
     }
 
@@ -124,10 +120,10 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
             Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
         int index = 0;
 
-        query.setParameter(++index, "%" + keyword + "%");
+        query.setParameter(++index, keyword + "*");
 
         if (writer != null && !writer.isBlank()) {
-            query.setParameter(++index, "%" + writer + "%");
+            query.setParameter(++index, writer + "*");
         }
         if (createdAtStart != null) {
             query.setParameter(++index, createdAtStart);

@@ -32,17 +32,20 @@ public class SearchService {
             String keyword, String writer, LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd, boolean descending, PostType postType, Pageable pageable) {
 
-        Page<BlogPostResponse> blogPostPage = blogPostRepository.findAllByKeywordV2(
-                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
-        List<BlogPostResponse> blogPostList = blogPostPage.getContent();
+        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG
+                ? blogPostRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, descending, pageable).getContent()
+                : null;
 
-        Page<CafePostResponse> cafePostPage = cafePostRepository.findAllByKeywordV2(
-                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
-        List<CafePostResponse> cafePostList = cafePostPage.getContent();
+        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE
+                ? cafePostRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, descending, pageable).getContent()
+                : null;
 
-        Page<NewsResponse> newsPage = newsRepository.findAllByKeywordV2(
-                keyword, writer, createdAtStart, createdAtEnd, descending, pageable);
-        List<NewsResponse> newsList = newsPage.getContent();
+        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS
+                ? newsRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, descending, pageable).getContent()
+                : null;
 
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }
