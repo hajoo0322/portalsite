@@ -40,29 +40,26 @@ public class NewsController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         Long memberId = authUser.memberId();
-        NewsResponse responseDto = NewsResponse.from(
-                newsService.createNews(requestDto, memberId));
+        NewsResponse response = newsService.createNews(requestDto, memberId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{newsId}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long newsId) {
-        NewsResponse responseDto = NewsResponse.from(newsService.getNewsById(newsId));
+        NewsResponse response = newsService.getNewsById(newsId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<List<NewsResponse>> getNewsListByCategory(
+    public ResponseEntity<NewsListResponse> getNewsListByCategory(
             @PathVariable Long categoryId,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
-        List<NewsResponse> responseDtoList = newsService.getNewsListByCategory(categoryId, pageable).stream()
-                .map(NewsResponse::from)
-                .toList();
+        NewsListResponse response = newsService.getNewsListByCategory(categoryId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{newsId}")
@@ -73,9 +70,9 @@ public class NewsController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         Long memberId = authUser.memberId();
-        NewsResponse responseDto = NewsResponse.from(newsService.updateNews(requestDto, newsId, memberId));
+        NewsResponse response = newsService.updateNews(requestDto, newsId, memberId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{newsId}")
