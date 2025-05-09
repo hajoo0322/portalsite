@@ -12,7 +12,7 @@ public interface CommentAlarmRepository extends JpaRepository<CommentAlarm, Long
 
     List<CommentAlarm> findByCafePostAndCafeMemberNot(CafePost post, CafeMember member);
 
-    Optional<CommentAlarm> findByCafeMemberAndCafePost(CafeMember member, CafePost post);
+    Optional<CommentAlarm> findByCafeMemberIdAndCafePostId(Long member, Long post);
 
-    List<CafeMember> findByCafePostId(Long cafePostId);
+    List<CommentAlarm> findByCafePostId(Long cafePostId);
 }

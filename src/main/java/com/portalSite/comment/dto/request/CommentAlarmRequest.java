@@ -4,7 +4,7 @@ import com.portalSite.cafe.entity.CafeMember;
 import com.portalSite.cafe.entity.CafePost;
 
 public record CommentAlarmRequest(
-        CafeMember cafeMember,
-        CafePost cafePost
+        Long cafeMemberId,
+        Long cafePostId
 ) {
 }

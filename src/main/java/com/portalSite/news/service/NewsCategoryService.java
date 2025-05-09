@@ -50,7 +50,7 @@ public class NewsCategoryService {
         if (newsList.isEmpty()) {
             return NewsCategoryListResponse.from("해당 카테고리에 존재하는 뉴스가 없습니다.", null);
         }
-        return NewsCategoryListResponse.from("뉴스 조회 성공", newsList);
+        return NewsCategoryListResponse.from("뉴스 조회 성공", newsList); // 뉴스카테고리 조회성공?
     }
 
     @Transactional
