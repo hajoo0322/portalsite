@@ -3,7 +3,6 @@ package com.portalSite.news.service;
 import com.portalSite.common.exception.custom.CustomException;
 import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.news.dto.request.NewsCategoryRequest;
-import com.portalSite.news.dto.response.NewsCategoryListResponse;
 import com.portalSite.news.dto.response.NewsCategoryResponse;
 import com.portalSite.news.entity.NewsCategory;
 import com.portalSite.news.repository.NewsCategoryRepository;
@@ -12,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,19 +38,20 @@ public class NewsCategoryService {
     }
 
     @Transactional(readOnly = true)
-    public NewsCategoryListResponse getSubCategoriesByParentId(Long parentId) {
+    public List<NewsCategoryResponse> getSubCategoriesByParentId(Long parentId, Pageable pageable) {
         if (!newsCategoryRepository.existsById(parentId)) {
             throw new CustomException(ErrorCode.NEWS_CATEGORY_NOT_FOUND);
         }
 
-        List<NewsCategoryResponse> newsList = newsCategoryRepository.findAllByParentId(parentId).stream()
+        List<NewsCategoryResponse> newsCategoryList = newsCategoryRepository.findByParentId(parentId, pageable).stream()
                 .map(NewsCategoryResponse::from)
                 .toList();
 
-        if (newsList.isEmpty()) {
-            return NewsCategoryListResponse.from("해당 카테고리에 존재하는 뉴스가 없습니다.", null);
+        if (newsCategoryList.isEmpty()) {
+            throw new CustomException(ErrorCode.CHILD_CATEGORY_NOT_FOUND);
         }
-        return NewsCategoryListResponse.from("뉴스 조회 성공", newsList);
+
+        return newsCategoryList;
     }
 
     @Transactional
