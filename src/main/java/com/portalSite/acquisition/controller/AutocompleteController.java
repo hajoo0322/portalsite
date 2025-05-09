@@ -18,7 +18,7 @@ public class AutocompleteController {
 
     private final PublishLogService publishLogService;
 
-    @PostMapping
+    @PostMapping("/auto-click")
     public ResponseEntity<Void> logAutocompleteClick(
             @RequestBody AutocompleteClickRequest autocompleteClickRequest,
             @CurrentClientIp String clientIp

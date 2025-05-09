@@ -46,7 +46,7 @@ public class BlogPostService {
         Member blogMember = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
 
-        if (blog.getMember().equals(blogMember)) {
+        if (!blog.getMember().equals(blogMember)) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
 
@@ -84,7 +84,7 @@ public class BlogPostService {
         BlogPost blogPost = blogPostRepository.findById(blogPostId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시글입니다."));
 
-        if (blogPost.getMember().getId().equals(memberId)) {
+        if (!blogPost.getMember().getId().equals(memberId)) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
         BlogBoard blogBoard = Optional.ofNullable(request.blogBoardId())
@@ -102,7 +102,7 @@ public class BlogPostService {
         BlogPost blogPost = blogPostRepository.findById(blogPostId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시물입니다."));
 
-        if (blogPost.getMember().getId().equals(memberId)) {
+        if (!blogPost.getMember().getId().equals(memberId)) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
         blogPostRepository.delete(blogPost);

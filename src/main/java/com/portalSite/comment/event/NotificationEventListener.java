@@ -1,6 +1,7 @@
 package com.portalSite.comment.event;
 
 import com.portalSite.cafe.entity.CafeMember;
+import com.portalSite.comment.entity.CommentAlarm;
 import com.portalSite.comment.service.CommentAlarmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -17,10 +18,10 @@ public class NotificationEventListener {
     @EventListener
     public void handleNewCommentNotification(CommentCreatedEvent event) {
 
-        List<CafeMember> subscriberList = commentAlarmService.findSubscribeMember(event.getPost().getId());
+        List<CommentAlarm> subscriberList = commentAlarmService.findSubscribeMember(event.getPost().getId());
 
-        for (CafeMember subscriber : subscriberList) {
-            commentAlarmService.sendAlarm(subscriber.getMember(), event.getComment());
+        for (CommentAlarm subscriber : subscriberList) {
+            commentAlarmService.sendAlarm(subscriber.getCafeMember().getMember(), event.getComment());
         }
     }
 }

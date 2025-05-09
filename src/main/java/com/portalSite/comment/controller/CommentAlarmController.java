@@ -8,24 +8,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/alarms")
+@RequestMapping("/cafe-members/{cafeMemberId}/cafe-posts/{cafePostId}/alarms")
 @RequiredArgsConstructor
 public class CommentAlarmController {
     private final CommentAlarmService commentAlarmService;
 
     @PostMapping
     public ResponseEntity<Void> registerAlarm(
-            @RequestBody CommentAlarmRequest request
+            @PathVariable Long cafeMemberId,
+            @PathVariable Long cafePostId
             ) {
-        commentAlarmService.registerAlarm(request);
+        commentAlarmService.registerAlarm(cafeMemberId,cafePostId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAlarm(
-            @RequestBody CommentAlarmRequest request
+            @PathVariable Long cafeMemberId,
+            @PathVariable Long cafePostId
     ) {
-        commentAlarmService.cancelAlarm(request);
+        commentAlarmService.cancelAlarm(cafeMemberId,cafePostId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

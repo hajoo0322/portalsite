@@ -17,15 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class CafeController {
 
     private final CafeService cafeService;
-    private final CafeMemberService cafeMemberService;
+
 
     @PostMapping
-    public ResponseEntity<CafeAndCafeMemberResponse> addCafe(
-            @RequestBody @Valid CafeAndCafeMemberRequest cafeAndCafeMemberRequest,
-            @AuthenticationPrincipal AuthUser authUser) {
-        CafeResponse cafeResponse = cafeService.addCafe(cafeAndCafeMemberRequest.cafeRequest());
-        CafeMemberResponse cafeMemberResponse = cafeMemberService.addFirstCafeMember(authUser.memberId(),cafeResponse.id(),cafeAndCafeMemberRequest.cafeMemberRequest());
-        return ResponseEntity.status(HttpStatus.CREATED).body(CafeAndCafeMemberResponse.from(cafeResponse,cafeMemberResponse));
+    public ResponseEntity<CafeResponse> addCafe(
+            @RequestBody @Valid CafeRequest cafeRequest) {
+        CafeResponse cafeResponse = cafeService.addCafe(cafeRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cafeResponse);
     }
 
     @GetMapping("/duplication")
