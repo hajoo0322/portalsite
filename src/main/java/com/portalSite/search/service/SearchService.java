@@ -7,12 +7,12 @@ import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.entity.PostType;
 import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
-import com.portalSite.search.dto.request.SearchRequest;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,19 +22,29 @@ public class SearchService {
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
 
-    public SearchResponse search(String keyword, Pageable pageable, PostType postType) {
+    /**
+     * 검색 기준<br>
+     * 카페, 뉴스 : 제목, 내용<br>
+     * 블로그 : 제목, 내용
+     */
+    public SearchResponse searchV3(
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, PostType postType, Pageable pageable) {
 
-        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
-                blogPostRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(BlogPostResponse::from).toList() : null;
+        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG
+                ? blogPostRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, pageable).getContent()
+                : null;
 
-        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
-                cafePostRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(CafePostResponse::from).toList() : null;
+        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE
+                ? cafePostRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, pageable).getContent()
+                : null;
 
-        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
-                newsRepository.findAllByKeyword(keyword, pageable).stream()
-                .map(NewsResponse::from).toList() : null;
+        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS
+                ? newsRepository.findAllByKeywordV2(
+                        keyword, writer, createdAtStart, createdAtEnd, pageable).getContent()
+                : null;
 
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }
