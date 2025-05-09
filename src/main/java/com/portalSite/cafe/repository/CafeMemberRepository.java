@@ -16,4 +16,5 @@ public interface CafeMemberRepository extends JpaRepository<CafeMember, Long> {
     Optional<CafeMember> findByNickname(String nickname);
 
     boolean existsByNickname(String nickname);
+
 }

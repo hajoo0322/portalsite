@@ -43,7 +43,7 @@ public class BlogBoardService {
         BlogBoard blogBoard = blogBoardRepository.findById(categoryId)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 게시판입니다."));
 
-        if (memberId.equals(blogBoard.getBlog().getMember().getId())) {
+        if (!memberId.equals(blogBoard.getBlog().getMember().getId())) {
             throw new RuntimeException("다른 사람의 블로그입니다.");
         }
         blogBoard.update(request.category());
