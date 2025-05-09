@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "cafe_post")
+@Table(name = "cafe_post", indexes = {
+        @Index(name = "idx_cafe_created_at", columnList = "created_at")})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CafePost extends BaseEntity {
 
