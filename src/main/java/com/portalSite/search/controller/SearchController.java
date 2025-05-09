@@ -1,6 +1,8 @@
 package com.portalSite.search.controller;
 
 import com.portalSite.comment.entity.PostType;
+import com.portalSite.common.exception.custom.CustomException;
+import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.kafka.KeywordProducer;
 import com.portalSite.search.dto.response.SearchResponse;
 import com.portalSite.search.dto.response.TopKeywordsResponse;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +47,7 @@ public class SearchController {
         SearchResponse response = searchService.
                 search(keyword, writer, createdAtStart, createdAtEnd, desc, postType, pageable);
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/v2")
@@ -57,7 +60,7 @@ public class SearchController {
     ) {
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         SearchResponse response = searchService.searchV2(keyword, pageable, postType);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/top-keywords")
@@ -66,7 +69,7 @@ public class SearchController {
         Set<String> result = redisTemplate.opsForZSet().reverseRange("popular:keywords", 0, 9);
 
         if(result == null || result.isEmpty()) {
-            throw new RuntimeException(); /*TODO notfound 예외처리*/
+            throw new CustomException(ErrorCode.TOP_KEYWORDS_NOT_FOUND);
         }
 
         List<TopKeywordsResponse> responseList = new ArrayList<>();
@@ -76,6 +79,6 @@ public class SearchController {
             responseList.add(new TopKeywordsResponse(rank++, keyword));
         }
 
-        return ResponseEntity.ok(responseList);
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 }

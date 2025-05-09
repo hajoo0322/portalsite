@@ -10,3 +10,17 @@
 #  token:
 #    prefix: "Bearer"
 #    expiration: 1800000000
+
+
+# 본인이 쓰고 있는 프로퍼티스 파일에 붙여넣기 하고 주석 해제(yml은 문법 수정 필요)
+
+#kafka
+##kafka broker address
+#spring.kafka.bootstrap-servers=주소 입력
+#
+#  ##producer
+#spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+#spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+#
+#  ##kstream
+#spring.kafka.streams.state-dir=디렉토리 주소 입력 ex)C:/Users/su992/Documents/kafka-state

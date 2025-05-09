@@ -15,12 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/posts/{postId}")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable Long postId,
             @RequestBody @Valid CommentRequest commentRequest,
@@ -31,7 +30,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> getCommentsOfPost(
             @PathVariable Long postId,
             @RequestParam(name = "type") PostType type
@@ -40,7 +39,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
-    @GetMapping("/members")
+    @GetMapping("/comments")
     public ResponseEntity<List<CommentResponse>> getCommentsOfMember(
             @AuthenticationPrincipal AuthUser authUser
     ) {
@@ -48,7 +47,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
-    @PatchMapping("/{commentId}")
+    @PatchMapping("/comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
             @RequestBody @Valid CommentRequest request,
@@ -58,7 +57,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal AuthUser authUser

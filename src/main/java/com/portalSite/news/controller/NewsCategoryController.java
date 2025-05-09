@@ -2,12 +2,13 @@ package com.portalSite.news.controller;
 
 import com.portalSite.member.entity.MemberRole;
 import com.portalSite.news.dto.request.NewsCategoryRequest;
-import com.portalSite.news.dto.response.NewsCategoryListResponse;
 import com.portalSite.news.dto.response.NewsCategoryResponse;
 import com.portalSite.news.service.NewsCategoryService;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,6 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,11 +43,11 @@ public class NewsCategoryController {
   }
 
   @GetMapping("/{categoryId}/subcategories")
-  @Secured(MemberRole.Authority.ADMIN)
-  public ResponseEntity<NewsCategoryListResponse> getSubCategoriesByParentId(
-      @PathVariable Long categoryId
+  public ResponseEntity<List<NewsCategoryResponse>> getSubCategoriesByParentId(
+      @PathVariable Long categoryId,
+      @PageableDefault(sort = "id", direction = DESC) Pageable pageable
   ) {
-    NewsCategoryListResponse response = newsCategoryService.getSubCategoriesByParentId(categoryId);
+    List<NewsCategoryResponse> response = newsCategoryService.getSubCategoriesByParentId(categoryId, pageable);
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }

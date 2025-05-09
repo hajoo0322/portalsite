@@ -10,10 +10,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,28 +40,26 @@ public class NewsController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         Long memberId = authUser.memberId();
-        NewsResponse responseDto = NewsResponse.from(
-                newsService.createNews(requestDto, memberId));
+        NewsResponse response = newsService.createNews(requestDto, memberId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{newsId}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long newsId) {
-        NewsResponse responseDto = NewsResponse.from(newsService.getNewsById(newsId));
+        NewsResponse response = newsService.getNewsById(newsId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/categories/{categoryId}")
-    public ResponseEntity<List<NewsResponse>> getNewsListByCategory(
-            @PathVariable Long categoryId
+    public ResponseEntity<NewsListResponse> getNewsListByCategory(
+            @PathVariable Long categoryId,
+            @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
-        List<NewsResponse> responseDtoList = newsService.getNewsListByCategory(categoryId).stream()
-                .map(NewsResponse::from)
-                .toList();
+        NewsListResponse response = newsService.getNewsListByCategory(categoryId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{newsId}")
@@ -70,9 +70,9 @@ public class NewsController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         Long memberId = authUser.memberId();
-        NewsResponse responseDto = NewsResponse.from(newsService.updateNews(requestDto, newsId, memberId));
+        NewsResponse response = newsService.updateNews(requestDto, newsId, memberId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{newsId}")

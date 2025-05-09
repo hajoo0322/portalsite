@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     // duplicate
     DUPLICATE_NAME(HttpStatus.BAD_REQUEST, "중복된 이름 입니다."),
+
     //blog
     BLOG_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 블로그입니다."),
 
@@ -28,9 +29,13 @@ public enum ErrorCode {
 
     //like
 
+    //search
+    TOP_KEYWORDS_NOT_FOUND(HttpStatus.NOT_FOUND, "인기 검색어가 존재하지 않습니다."),
+
     //news
     NEWS_CATEGORY_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 존재하는 카테고리입니다."),
     PARENT_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 상위 카테고리입니다."),
+    CHILD_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "하위 카테고리가 존재하지 않습니다."),
     NEWS_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 뉴스입니다."),
     AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 작성자입니다."),
@@ -39,7 +44,6 @@ public enum ErrorCode {
 
     //member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 멤버입니다."),
-
 
     //chatbot
     CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 CHAT ROOM 입니다."),

@@ -18,13 +18,13 @@ public class AutocompleteController {
 
     private final PublishLogService publishLogService;
 
-    @PostMapping
+    @PostMapping("/auto-click")
     public ResponseEntity<Void> logAutocompleteClick(
             @RequestBody AutocompleteClickRequest autocompleteClickRequest,
             @CurrentClientIp String clientIp
     ) {
 
-
+        publishLogService.sendAutocompleteClickEvent(autocompleteClickRequest, clientIp);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
