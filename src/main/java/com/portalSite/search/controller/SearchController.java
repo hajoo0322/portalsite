@@ -32,8 +32,8 @@ public class SearchController {
     private final KeywordProducer keywordProducer;
     private final RedisTemplate<String,String> redisTemplate;
 
-    @GetMapping
-    public ResponseEntity<SearchResponse> search(
+    @GetMapping("/v3")
+    public ResponseEntity<SearchResponse> searchV3(
             @RequestParam("keyword")
             @NotBlank(message = "검색어를 입력해주세요")
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
@@ -45,7 +45,7 @@ public class SearchController {
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
         SearchResponse response = searchService.
-                search(keyword, writer, createdAtStart, createdAtEnd, desc, postType, pageable);
+                searchV3(keyword, writer, createdAtStart, createdAtEnd, desc, postType, pageable);
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

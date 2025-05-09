@@ -9,7 +9,6 @@ import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class SearchService {
      * 카페, 뉴스 : 제목, 내용<br>
      * 블로그 : 제목, 내용
      */
-    public SearchResponse search(
+    public SearchResponse searchV3(
             String keyword, String writer, LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd, boolean descending, PostType postType, Pageable pageable) {
 
