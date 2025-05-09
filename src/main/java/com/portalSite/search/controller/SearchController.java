@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class SearchController {
     ) {
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         SearchResponse response = searchService.search(keyword, pageable, postType);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/v2")
@@ -53,7 +54,7 @@ public class SearchController {
     ) {
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         SearchResponse response = searchService.searchV2(keyword, pageable, postType);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/top-keywords")
@@ -72,6 +73,6 @@ public class SearchController {
             responseList.add(new TopKeywordsResponse(rank++, keyword));
         }
 
-        return ResponseEntity.ok(responseList);
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 }
