@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 
 public interface BlogPostRepositoryCustom {
 
-    Page<BlogPostResponse> findAllByKeywordV2(String keyword, String writer,
-                                            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
-                                            boolean descending, Pageable pageable);
+    Page<BlogPostResponse> findAllByKeywordV2(
+            String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, Pageable pageable);
 
     Page<BlogPostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
 }

@@ -18,9 +18,8 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
 
     @Override
     public Page<NewsResponse> findAllByKeywordV2(
-            String keyword, String writer,
-            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
-            boolean descending, Pageable pageable) {
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, Pageable pageable) {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +

@@ -17,9 +17,8 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
 
     @Override
     public Page<CafePostResponse> findAllByKeywordV2(
-            String keyword, String writer,
-            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
-            boolean descending, Pageable pageable) {
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, Pageable pageable) {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +

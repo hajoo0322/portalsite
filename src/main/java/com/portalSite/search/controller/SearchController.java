@@ -40,12 +40,11 @@ public class SearchController {
             @RequestParam(value = "writer", required = false) String writer,
             @RequestParam(value = "created_at_start", required = false) LocalDateTime createdAtStart,
             @RequestParam(value = "created_at_end", required = false) LocalDateTime createdAtEnd,
-            @RequestParam(value = "desc", defaultValue = "true") boolean desc,
             @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
         SearchResponse response = searchService.
-                searchV3(keyword, writer, createdAtStart, createdAtEnd, desc, postType, pageable);
+                searchV3(keyword, writer, createdAtStart, createdAtEnd, postType, pageable);
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 
 public interface CafePostRepositoryCustom {
 
-    Page<CafePostResponse> findAllByKeywordV2(String keyword, String writer,
-                                              LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
-                                              boolean descending, Pageable pageable);
+    Page<CafePostResponse> findAllByKeywordV2(
+            String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, Pageable pageable);
 
     Page<CafePostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
 }

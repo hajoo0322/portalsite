@@ -17,9 +17,8 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
 
     @Override
     public Page<BlogPostResponse> findAllByKeywordV2(
-            String keyword, String writer,
-            LocalDateTime createdAtStart, LocalDateTime createdAtEnd,
-            boolean descending, Pageable pageable) {
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, Pageable pageable) {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT bp.id, bp.member_id, bp.blog_board_id, bp.title, bp.description " +
