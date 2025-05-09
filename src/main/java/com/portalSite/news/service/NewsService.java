@@ -6,6 +6,8 @@ import com.portalSite.member.entity.Member;
 import com.portalSite.member.repository.MemberRepository;
 import com.portalSite.news.dto.request.NewsCreateRequest;
 import com.portalSite.news.dto.request.NewsRequest;
+import com.portalSite.news.dto.response.NewsListResponse;
+import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.entity.News;
 import com.portalSite.news.entity.NewsCategory;
 import com.portalSite.news.repository.NewsCategoryRepository;
@@ -27,7 +29,7 @@ public class NewsService {
     private final NewsCategoryRepository newsCategoryRepository;
 
     @Transactional
-    public News createNews(NewsCreateRequest requestDto, Long memberId) {
+    public NewsResponse createNews(NewsCreateRequest requestDto, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.AUTHOR_NOT_FOUND)
         );
@@ -39,28 +41,38 @@ public class NewsService {
 
         News news = News.of(member, newsCategory, requestDto.newsTitle(), requestDto.description());
 
-        return newsRepository.save(news);
+        return NewsResponse.from(newsRepository.save(news));
     }
 
     @Transactional(readOnly = true)
-    public News getNewsById(Long newsId) {
-        return newsRepository.findById(newsId).orElseThrow(
+    public NewsResponse getNewsById(Long newsId) {
+        return NewsResponse.from(newsRepository.findById(newsId).orElseThrow(
                 () -> new CustomException(ErrorCode.NEWS_NOT_FOUND)
-        );
+        ));
     }
 
     @Transactional(readOnly = true)
-    public List<News> getNewsListByCategory(Long categoryId, Pageable pageable) {
-        return newsRepository.findAllByNewsCategoryId(categoryId, pageable);
+    public NewsListResponse getNewsListByCategory(Long categoryId, Pageable pageable) {
+        List<NewsResponse> newsList = newsRepository.findAllByNewsCategoryId(categoryId, pageable).stream()
+                .map(NewsResponse::from)
+                .toList();
+
+        if (newsList.isEmpty()) {
+            return NewsListResponse.from("해당 카테고리에 존재하는 뉴스가 없습니다.", null);
+        }
+        return NewsListResponse.from("뉴스 조회 성공", newsList);
     }
 
     @Transactional
-    public News updateNews(NewsRequest requestDto, Long newsId, Long memberId) {
+    public NewsResponse updateNews(NewsRequest requestDto, Long newsId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(
                 () ->new CustomException(ErrorCode.MEMBER_NOT_FOUND)
         );
 
-        News news = getNewsById(newsId);
+        News news = newsRepository.findById(newsId).orElseThrow(
+                () -> new CustomException(ErrorCode.NEWS_NOT_FOUND)
+        );
+
         if (!memberId.equals(news.getMember().getId())) {
             throw new CustomException(ErrorCode.NO_UPDATE_PERMISSION);
         }
@@ -72,12 +84,15 @@ public class NewsService {
 
         news.updateNews(newsCategory, requestDto.newsTitle(), requestDto.description());
 
-        return news;
+        return NewsResponse.from(news);
     }
 
     @Transactional
     public void deleteNews(Long newsId, Long memberId) {
-        News news = getNewsById(newsId);
+        News news = newsRepository.findById(newsId).orElseThrow(
+                () -> new CustomException(ErrorCode.NEWS_NOT_FOUND)
+        );
+
         if (!memberId.equals(news.getMember().getId())) {
             throw new CustomException(ErrorCode.NO_DELETE_PERMISSION);
         }
