@@ -100,12 +100,18 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
         Flux.merge(calls)
                 .doOnNext(responseMap -> {
                     for (Map.Entry<String, List<AutocompleteSuggestionResponse>> entry : responseMap.entrySet()) {
-                        String keyword = entry.getKey();
                         List<AutocompleteSuggestionResponse> suggestions = entry.getValue();
 
-                        redisTemplate.delete("autocomplete:" + keyword);
                         for (AutocompleteSuggestionResponse suggestion : suggestions) {
-                            redisTemplate.opsForZSet().add("autocomplete:" + keyword, suggestion.suggestion(), suggestion.score());
+                            String full = suggestion.suggestion(); // ex) 사물인터넷
+                            double score = suggestion.score();
+
+                            for (int i = 1; i <= full.length(); i++) {
+                                String prefix = full.substring(0, i); // 사, 사물, 사물인...
+
+                                String redisKey = "autocomplete:" + prefix;
+                                redisTemplate.opsForZSet().add(redisKey, full, score);
+                            }
                         }
                     }
                 })

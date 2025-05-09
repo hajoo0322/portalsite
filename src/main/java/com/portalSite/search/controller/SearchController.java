@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -28,7 +30,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class SearchController {
     private final SearchService searchService;
     private final KeywordProducer keywordProducer;
-    private final RedisTemplate<String,String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @GetMapping
     public ResponseEntity<SearchResponse> search(
@@ -57,20 +59,40 @@ public class SearchController {
     }
 
     @GetMapping("/top-keywords")
-    public ResponseEntity<List<TopKeywordsResponse>> getKeywordRanking(){
+    public ResponseEntity<List<TopKeywordsResponse>> getKeywordRanking() {
         //아래 linkedHashSet은 삽입 순서 유지
         Set<String> result = redisTemplate.opsForZSet().reverseRange("popular:keywords", 0, 9);
 
-        if(result == null || result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             throw new CustomException(ErrorCode.TOP_KEYWORDS_NOT_FOUND);
         }
 
         List<TopKeywordsResponse> responseList = new ArrayList<>();
 
         int rank = 1;
-        for(String keyword : result) {
+        for (String keyword : result) {
             responseList.add(new TopKeywordsResponse(rank++, keyword));
         }
+
+        return ResponseEntity.ok(responseList);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<String>> getSuggestions(@RequestParam String prefix) {
+        String redisKey = "autocomplete:" + prefix;
+
+        Set<ZSetOperations.TypedTuple<String>> results = redisTemplate.opsForZSet()
+                .reverseRangeWithScores(redisKey, 0, 9);
+
+        if (results == null) return ResponseEntity.noContent().build();
+
+        List<String> responseList = results.stream()
+                .sorted((a, b) -> Double.compare(
+                        b.getScore() != null ? b.getScore() : 0,
+                        a.getScore() != null ? a.getScore() : 0
+                ))
+                .map(ZSetOperations.TypedTuple::getValue)
+                .toList();
 
         return ResponseEntity.ok(responseList);
     }
