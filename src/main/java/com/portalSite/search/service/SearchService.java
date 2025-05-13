@@ -5,11 +5,13 @@ import com.portalSite.blog.repository.BlogPostRepository;
 import com.portalSite.cafe.dto.CafePostResponse;
 import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.comment.entity.PostType;
+import com.portalSite.common.infra.redis.RedisService;
 import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
 import com.portalSite.search.dto.response.SearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ public class SearchService {
     private final BlogPostRepository blogPostRepository;
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
+    private final RedisService redisService;
 
     /**
      * 검색 기준<br>
@@ -30,6 +33,16 @@ public class SearchService {
     public SearchResponse searchV3(
             String keyword, String writer, LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd, PostType postType, Pageable pageable) {
+
+        Sort.Direction direction = pageable.getSort()
+                .stream().findFirst().map(Sort.Order::getDirection)
+                .orElse(Sort.Direction.DESC);
+
+        Object cached = redisService.getSearchResult(keyword, writer, createdAtStart, createdAtEnd,
+                postType, pageable.getPageNumber(), pageable.getPageSize(), direction);
+        if (cached != null) {
+            return (SearchResponse) cached;
+        }
 
         List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG
                 ? blogPostRepository.findAllByKeywordV2(
@@ -45,8 +58,12 @@ public class SearchService {
                 ? newsRepository.findAllByKeywordV2(
                         keyword, writer, createdAtStart, createdAtEnd, pageable).getContent()
                 : null;
+        SearchResponse response = SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
 
-        return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
+        redisService.cacheSearchResult(keyword, writer, createdAtStart, createdAtEnd,
+                postType, pageable.getPageNumber(), pageable.getPageSize(), direction, response);
+
+        return response;
     }
 
     public SearchResponse searchV2(String keyword, Pageable pageable, PostType postType) {
