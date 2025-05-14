@@ -1,5 +1,6 @@
 package com.portalSite.search.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portalSite.blog.dto.response.BlogPostResponse;
 import com.portalSite.blog.repository.BlogPostRepository;
 import com.portalSite.cafe.dto.CafePostResponse;
@@ -24,6 +25,7 @@ public class SearchService {
     private final CafePostRepository cafePostRepository;
     private final NewsRepository newsRepository;
     private final RedisService redisService;
+    private final ObjectMapper objectMapper;
 
     /**
      * 검색 기준<br>
@@ -41,7 +43,7 @@ public class SearchService {
         Object cached = redisService.getSearchResult(keyword, writer, createdAtStart, createdAtEnd,
                 postType, pageable.getPageNumber(), pageable.getPageSize(), direction);
         if (cached != null) {
-            return (SearchResponse) cached;
+            return objectMapper.convertValue(cached, SearchResponse.class);
         }
 
         List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG
