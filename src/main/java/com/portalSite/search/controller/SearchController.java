@@ -40,7 +40,7 @@ public class SearchController {
             @RequestParam(value = "writer", required = false) String writer,
             @RequestParam(value = "created_at_start", required = false) LocalDateTime createdAtStart,
             @RequestParam(value = "created_at_end", required = false) LocalDateTime createdAtEnd,
-            @RequestParam(value = "postType", required = false) PostType postType,
+            @RequestParam(value = "post_type", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
         SearchResponse response = searchService.
