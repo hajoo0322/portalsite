@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.portalSite.search.document.PostSearchDocument;
+import com.portalSite.search.repository.PostSearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,7 @@ public class BlogPostService {
     private final BlogPostRepository blogPostRepository;
     private final BlogBoardRepository blogBoardRepository;
     private final BlogRepository blogRepository;
+    private final PostSearchRepository postSearchRepository;
 
     private final HashtagRepository hashtagRepository;
     private final MemberRepository memberRepository;
@@ -54,7 +58,12 @@ public class BlogPostService {
             request.description());
 
         BlogPost connectedPost = connectHashtags(blogPost, request.hashtags());
-        return BlogPostResponse.from(blogPostRepository.save(connectedPost));
+        BlogPost savedBlogPost = blogPostRepository.save(connectedPost);
+
+        PostSearchDocument document = PostSearchDocument.from(savedBlogPost);
+        postSearchRepository.save(document);
+
+        return BlogPostResponse.from(savedBlogPost);
     }
 
     @Transactional(readOnly = true)

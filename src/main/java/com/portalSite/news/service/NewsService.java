@@ -15,6 +15,8 @@ import com.portalSite.news.repository.NewsRepository;
 
 import java.util.List;
 
+import com.portalSite.search.document.PostSearchDocument;
+import com.portalSite.search.repository.PostSearchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class NewsService {
     private final NewsRepository newsRepository;
     private final MemberRepository memberRepository;
     private final NewsCategoryRepository newsCategoryRepository;
+    private final PostSearchRepository postSearchRepository;
 
     @Transactional
     public NewsResponse createNews(NewsCreateRequest requestDto, Long memberId) {
@@ -40,8 +43,12 @@ public class NewsService {
                 );
 
         News news = News.of(member, newsCategory, requestDto.newsTitle(), requestDto.description());
+        News savedNews = newsRepository.save(news);
 
-        return NewsResponse.from(newsRepository.save(news));
+        PostSearchDocument document = PostSearchDocument.from(savedNews);
+        postSearchRepository.save(document);
+
+        return NewsResponse.from(savedNews);
     }
 
     @Transactional(readOnly = true)

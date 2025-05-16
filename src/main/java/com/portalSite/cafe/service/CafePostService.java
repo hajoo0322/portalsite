@@ -12,6 +12,8 @@ import com.portalSite.cafe.repository.CafePostRepository;
 import com.portalSite.cafe.repository.CafeRepository;
 import com.portalSite.common.exception.core.NotFoundException;
 import com.portalSite.common.exception.custom.ErrorCode;
+import com.portalSite.search.document.PostSearchDocument;
+import com.portalSite.search.repository.PostSearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class CafePostService {
     private final CafeBoardRepository cafeBoardRepository;
     private final CafeRepository cafeRepository;
     private final CafeMemberRepository cafeMemberRepository;
+    private final PostSearchRepository postSearchRepository;
 
     @Transactional
     public CafePostResponse addCafePost(CafePostRequest cafePostRequest, Long cafeId, Long cafeBoardId, Long memberId) {
@@ -34,6 +37,10 @@ public class CafePostService {
         CafeMember cafeMember = cafeMemberRepository.findByCafeIdAndMemberId(cafeId, memberId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_MEMBER_NOT_FOUND));
         CafePost cafePost = CafePost.of(cafe, cafeBoard, cafeMember, cafePostRequest.title(), cafePostRequest.description());
         CafePost savedCafePost = cafePostRepository.save(cafePost);
+
+        PostSearchDocument document = PostSearchDocument.from(savedCafePost);
+        postSearchRepository.save(document);
+
         return CafePostResponse.from(savedCafePost);
     }
 
