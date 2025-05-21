@@ -67,6 +67,9 @@ dependencies {
 
 	//Jackson에 Java 8 시간 모듈 등록
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	//ES clients
+	implementation 'co.elastic.clients:elasticsearch-java:8.12.0'
 }
 
 // queryDSL 시작
