@@ -1,8 +1,6 @@
 package com.portalSite.blog.dto.response;
 
 import com.portalSite.blog.entity.BlogPost;
-import lombok.Getter;
-
 
 public record BlogPostResponse(
     Long id,
