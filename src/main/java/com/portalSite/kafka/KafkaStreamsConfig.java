@@ -46,7 +46,7 @@ public class KafkaStreamsConfig {
                 .aggregate(
                         () -> 0.0,
                         (keyword, event, score) -> score + calculatePopularSearchScore(event),
-                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as("keyword-score-store")
+                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as("keyword-score-store") //내가 뭘시발건드렸을까
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(Serdes.Double())
                 )

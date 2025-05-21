@@ -1,43 +1,64 @@
 package com.portalSite.blog.repository;
 
 import com.portalSite.blog.dto.response.BlogPostResponse;
-import com.portalSite.blog.entity.BlogPost;
-import com.portalSite.blog.entity.QBlogPost;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
-
-    private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
     @Override
-    public Page<BlogPost> findAllByKeyword(String keyword, Pageable pageable) {
-        QBlogPost blogPost = QBlogPost.blogPost;
+    public Page<BlogPostResponse> findAllByKeywordV2(
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, Pageable pageable) {
 
-        List<BlogPost> result = queryFactory
-                .selectFrom(blogPost)
-                .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword)))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        StringBuilder sql = new StringBuilder(
+                "SELECT bp.id, bp.member_id, bp.blog_board_id, bp.title, bp.description " +
+                        "FROM blog_post bp JOIN member m ON bp.member_id = m.member_id " +
+                        "WHERE MATCH(bp.title, bp.description) AGAINST (?1 IN BOOLEAN MODE)");
 
-        Long total = queryFactory
-                .select(blogPost.count())
-                .from(blogPost)
-                .where(blogPost.title.containsIgnoreCase(keyword)
-                        .or(blogPost.description.containsIgnoreCase(keyword)))
-                .fetchOne();
+        appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
-        return new PageImpl<>(result, pageable, total != null ? total : 0);
+        sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        setParams(query, keyword, writer, createdAtStart, createdAtEnd);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        List<BlogPostResponse> content = rows
+                .stream()
+                .map(row -> {
+                    return new BlogPostResponse(
+                            ((Long) ((Object[]) row)[0]),  // id
+                            ((Long) ((Object[]) row)[1]),  // blog_id
+                            ((Long) ((Object[]) row)[2]),  // blog_board_id
+                            (String) ((Object[]) row)[3],  // title
+                            (String) ((Object[]) row)[4]   // description
+                    );
+                })
+                .toList();
+
+        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
+                "FROM blog_post bp JOIN member m ON bp.member_id = m.member_id " +
+                "WHERE MATCH(bp.title, bp.description) AGAINST (?1 IN BOOLEAN MODE)");
+
+        appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
+        Query countQuery = entityManager.createNativeQuery(countSql.toString());
+        setParams(countQuery, keyword, writer, createdAtStart, createdAtEnd);
+
+        long total = ((Number) countQuery.getSingleResult()).longValue();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -75,5 +96,37 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
                 .getSingleResult());
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private void appendSearchCondition(
+            StringBuilder sql, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 1;
+
+        if (writer != null && !writer.isBlank()) {
+            sql.append(" AND MATCH (m.name) AGAINST (?").append(++index).append(" IN BOOLEAN MODE) ");
+        }
+        if (createdAtStart != null) {
+            sql.append(" AND bp.created_at >= ?").append(++index);
+        }
+        if (createdAtEnd != null) {
+            sql.append(" AND bp.created_at <= ?").append(++index);
+        }
+    }
+
+    private void setParams(
+            Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 0;
+
+        query.setParameter(++index, keyword + "*");
+
+        if (writer != null && !writer.isBlank()) {
+            query.setParameter(++index, writer + "*");
+        }
+        if (createdAtStart != null) {
+            query.setParameter(++index, createdAtStart);
+        }
+        if (createdAtEnd != null) {
+            query.setParameter(++index, createdAtEnd);
+        }
     }
 }

@@ -20,7 +20,7 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic autocompleteTopic() {
-        return TopicBuilder.name("Autocomplete-events")
+        return TopicBuilder.name("autocomplete-events")
                 .partitions(3)
                 .replicas(1)
                 .build();

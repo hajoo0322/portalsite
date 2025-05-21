@@ -1,48 +1,66 @@
 package com.portalSite.news.repository;
 
 import com.portalSite.news.dto.response.NewsResponse;
-import com.portalSite.news.entity.News;
-import com.portalSite.news.entity.QNews;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class NewsRepositoryImpl implements NewsRepositoryCustom{
-
-    private final JPAQueryFactory queryFactory;
+public class NewsRepositoryImpl implements NewsRepositoryCustom {
     private final EntityManager entityManager;
 
     @Override
-    public Page<News> findAllByKeyword(String keyword, Pageable pageable) {
-        QNews news = QNews.news;
+    public Page<NewsResponse> findAllByKeywordV2(
+            String keyword, String writer, LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd, Pageable pageable) {
 
-        List<News> result = queryFactory
-                .selectFrom(news)
-                .where(news.newsTitle.containsIgnoreCase(keyword).
-                        or(news.description.containsIgnoreCase(keyword)))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        StringBuilder sql = new StringBuilder(
+                "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
+                        "FROM news n JOIN member m on n.member_id = m.member_id " +
+                        "WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE)");
 
-        Long total = queryFactory
-                .select(news.count())
-                .from(news)
-                .where(
-                        news.newsTitle.containsIgnoreCase(keyword)
-                                .or(news.description.containsIgnoreCase(keyword))
-                )
-                .fetchOne();
+        appendSearchCondition(sql, writer, createdAtStart, createdAtEnd);
 
-        return new PageImpl<>(result, pageable, total != null ? total : 0);
+        sql.append(" LIMIT ").append(pageable.getPageSize()).append(" OFFSET ").append(pageable.getOffset());
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        setParams(query, keyword, writer, createdAtStart, createdAtEnd);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = query.getResultList();
+
+        List<NewsResponse> content = rows
+                .stream()
+                .map(row -> {
+                    return new NewsResponse(
+                            ((Long) ((Object[]) row)[0]),          // id
+                            (String) ((Object[]) row)[1],          // name
+                            ((Long) ((Object[]) row)[2]),          // news_category_id
+                            (String) ((Object[]) row)[3],          // title
+                            (String) ((Object[]) row)[4],          // description
+                            ((Timestamp) ((Object[]) row)[5]).toLocalDateTime()  // created_at
+                    );
+                })
+                .toList();
+
+        StringBuilder countSql = new StringBuilder("SELECT COUNT(*) " +
+                "FROM news n JOIN member m on n.member_id = m.member_id " +
+                "WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE)");
+
+        appendSearchCondition(countSql, writer, createdAtStart, createdAtEnd);
+        Query countQuery = entityManager.createNativeQuery(countSql.toString());
+        setParams(countQuery, keyword, writer, createdAtStart, createdAtEnd);
+
+        long total = ((Number) countQuery.getSingleResult()).longValue();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -81,5 +99,38 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom{
                 .getSingleResult());
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private void appendSearchCondition(
+            StringBuilder sql, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 1;
+
+        if (writer != null && !writer.isBlank()) {
+            sql.append(" AND MATCH(m.name) AGAINST (?").append(++index).append(" IN BOOLEAN MODE) ");
+        }
+        if (createdAtStart != null) {
+            sql.append(" AND n.created_at >= ?").append(++index);
+        }
+        if (createdAtEnd != null) {
+            sql.append(" AND n.created_at <= ?").append(++index);
+        }
+    }
+
+
+    private void setParams(
+            Query query, String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd) {
+        int index = 0;
+
+        query.setParameter(++index, keyword + "*");
+
+        if (writer != null && !writer.isBlank()) {
+            query.setParameter(++index, writer + "*");
+        }
+        if (createdAtStart != null) {
+            query.setParameter(++index, createdAtStart);
+        }
+        if (createdAtEnd != null) {
+            query.setParameter(++index, createdAtEnd);
+        }
     }
 }

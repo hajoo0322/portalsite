@@ -16,7 +16,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PopularKeywordSyncScheduler implements InitializingBean {
@@ -29,14 +32,20 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        this.kafkaStreams = waitForKafkaStreams(factoryBean);
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            this.kafkaStreams = factoryBean.getKafkaStreams();
+            if (this.kafkaStreams == null) {
+                log.warn("❗ KafkaStreams is still null after delay.");
+            } else {
+                log.info("✅ KafkaStreams READY: {}", kafkaStreams.state());
+            }
+        }, 10, TimeUnit.SECONDS);
     }
 
-    private KafkaStreams waitForKafkaStreams(StreamsBuilderFactoryBean factoryBean) {
-        return factoryBean.getKafkaStreams();
-    }
+
     @Scheduled(fixedDelay = 10000)
     public void syncTopKeywordToRedis() {
+        System.out.println("Current State: " + kafkaStreams.state());
 
         Collection<StreamsMetadata> metadataList = kafkaStreams.streamsMetadataForStore("keyword-score-store");
         PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingDouble(KeywordScore::score));
