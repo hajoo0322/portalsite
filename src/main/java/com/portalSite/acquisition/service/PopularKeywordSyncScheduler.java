@@ -3,7 +3,6 @@ package com.portalSite.acquisition.service;
 import com.portalSite.acquisition.dto.kafkaDto.AutocompleteSuggestionResponse;
 import com.portalSite.acquisition.dto.kafkaDto.KeywordScore;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsMetadata;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,6 +42,8 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
         PriorityQueue<KeywordScore> heap = new PriorityQueue<>(10, Comparator.comparingDouble(KeywordScore::score));
         List<Mono<List<KeywordScore>>> calls = new ArrayList<>();
 
+        System.out.println("📭 metadataList.size(): " + metadataList.size());
+
         for (StreamsMetadata metadata : metadataList) {
             String baseUrl = "http://" + metadata.host() + ":" + metadata.port();
             Mono<List<KeywordScore>> response = webclientBuilder.build()
@@ -58,7 +59,9 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
             calls.add(response);
         }
         Flux.merge(calls)
+                .filter(list -> !list.isEmpty())  // 빈 응답 제거
                 .doOnNext(list -> {
+                    System.out.println("📦 응답 리스트 크기: " + list.size());
                     for (KeywordScore ks : list) {
                         heap.offer(ks);
                         if (heap.size() > 10) heap.poll();
@@ -71,8 +74,10 @@ public class PopularKeywordSyncScheduler implements InitializingBean {
                     redisTemplate.delete("popular:keywords");
                     for (KeywordScore ks : top10) {
                         redisTemplate.opsForZSet().add("popular:keywords", ks.keyword(), ks.score());
+                        System.out.println("✅ 저장됨! " + ks.keyword() + " - " + ks.score());
                     }
                 })
+                .doOnError(e -> System.err.println("🔥 Flux 오류: " + e.getMessage()))
                 .subscribe();
     }
 
