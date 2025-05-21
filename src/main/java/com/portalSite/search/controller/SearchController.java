@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -34,20 +33,16 @@ public class SearchController {
     private final KeywordProducer keywordProducer;
     private final RedisTemplate<String, String> redisTemplate;
 
-    @GetMapping("/v3")
-    public ResponseEntity<SearchResponse> searchV3(
+    @GetMapping("/v1")
+    public ResponseEntity<SearchResponse> searchV1(
             @RequestParam("keyword")
             @NotBlank(message = "검색어를 입력해주세요")
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
-            @RequestParam(value = "writer", required = false) String writer,
-            @RequestParam(value = "created_at_start", required = false) LocalDateTime createdAtStart,
-            @RequestParam(value = "created_at_end", required = false) LocalDateTime createdAtEnd,
-            @RequestParam(value = "post_type", required = false) PostType postType,
+            @RequestParam(value = "postType", required = false) PostType postType,
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
-        SearchResponse response = searchService.
-                searchV3(keyword, writer, createdAtStart, createdAtEnd, postType, pageable);
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
+        SearchResponse response = searchService.search(keyword, pageable, postType);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -76,6 +71,23 @@ public class SearchController {
         SearchResponse response = searchService.searchByElasticsearch(keyword, pageable, postType);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+//    @GetMapping("/v3")
+//    public ResponseEntity<SearchResponse> searchV3(
+//            @RequestParam("keyword")
+//            @NotBlank(message = "검색어를 입력해주세요")
+//            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
+//            @RequestParam(value = "writer", required = false) String writer,
+//            @RequestParam(value = "created_at_start", required = false) LocalDateTime createdAtStart,
+//            @RequestParam(value = "created_at_end", required = false) LocalDateTime createdAtEnd,
+//            @RequestParam(value = "post_type", required = false) PostType postType,
+//            @PageableDefault(sort = "id", direction = DESC) Pageable pageable
+//    ) {
+//        SearchResponse response = searchService.
+//                searchV3(keyword, writer, createdAtStart, createdAtEnd, postType, pageable);
+//        keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
 
     @GetMapping("/top-keywords")
     public ResponseEntity<List<TopKeywordsResponse>> getKeywordRanking() {

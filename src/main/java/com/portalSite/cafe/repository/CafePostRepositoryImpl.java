@@ -1,6 +1,9 @@
 package com.portalSite.cafe.repository;
 
 import com.portalSite.cafe.dto.CafePostResponse;
+import com.portalSite.cafe.entity.CafePost;
+import com.portalSite.cafe.entity.QCafePost;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +16,32 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+
+    @Override
+    public Page<CafePost> findAllByKeyword(String keyword, Pageable pageable) {
+        QCafePost cafePost = QCafePost.cafePost;
+
+        List<CafePost> responses = queryFactory
+                .selectFrom(cafePost)
+                .where(cafePost.title.containsIgnoreCase(keyword)
+                        .or(cafePost.description.containsIgnoreCase(keyword)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(cafePost.count())
+                .from(cafePost)
+                .where(cafePost.title.containsIgnoreCase(keyword)
+                        .or(cafePost.description.containsIgnoreCase(keyword)))
+                .fetchOne();
+
+        return new PageImpl<>(responses, pageable, total != null ? total : 0);
+    }
+
 
     @Override
     public Page<CafePostResponse> findAllByKeywordV2(

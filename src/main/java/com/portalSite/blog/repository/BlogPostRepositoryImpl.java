@@ -1,6 +1,9 @@
 package com.portalSite.blog.repository;
 
 import com.portalSite.blog.dto.response.BlogPostResponse;
+import com.portalSite.blog.entity.BlogPost;
+import com.portalSite.blog.entity.QBlogPost;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +16,31 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+
+    @Override
+    public Page<BlogPost> findAllByKeyword(String keyword, Pageable pageable) {
+        QBlogPost blogPost = QBlogPost.blogPost;
+
+        List<BlogPost> result = queryFactory
+                .selectFrom(blogPost)
+                .where(blogPost.title.containsIgnoreCase(keyword)
+                        .or(blogPost.description.containsIgnoreCase(keyword)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(blogPost.count())
+                .from(blogPost)
+                .where(blogPost.title.containsIgnoreCase(keyword)
+                        .or(blogPost.description.containsIgnoreCase(keyword)))
+                .fetchOne();
+
+        return new PageImpl<>(result, pageable, total != null ? total : 0);
+    }
 
     @Override
     public Page<BlogPostResponse> findAllByKeywordV2(

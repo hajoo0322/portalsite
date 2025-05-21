@@ -1,6 +1,9 @@
 package com.portalSite.news.repository;
 
 import com.portalSite.news.dto.response.NewsResponse;
+import com.portalSite.news.entity.News;
+import com.portalSite.news.entity.QNews;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +17,33 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class NewsRepositoryImpl implements NewsRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+
+    @Override
+    public Page<News> findAllByKeyword(String keyword, Pageable pageable) {
+        QNews news = QNews.news;
+
+        List<News> result = queryFactory
+                .selectFrom(news)
+                .where(news.newsTitle.containsIgnoreCase(keyword).
+                        or(news.description.containsIgnoreCase(keyword)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = queryFactory
+                .select(news.count())
+                .from(news)
+                .where(
+                        news.newsTitle.containsIgnoreCase(keyword)
+                                .or(news.description.containsIgnoreCase(keyword))
+                )
+                .fetchOne();
+
+        return new PageImpl<>(result, pageable, total != null ? total : 0);
+    }
 
     @Override
     public Page<NewsResponse> findAllByKeywordV2(
