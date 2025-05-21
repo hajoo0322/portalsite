@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +57,19 @@ public class SearchController {
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
         SearchResponse response = searchService.searchV2(keyword, pageable, postType);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/es")
+    public ResponseEntity<SearchResponse> searchFromES(
+            @RequestParam("keyword")
+            @NotBlank(message = "검색어를 입력해주세요")
+            @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
+            @RequestParam(value = "postType", required = false) PostType postType,
+            @PageableDefault(sort = "id", direction = DESC) Pageable pageable
+    ) {
+        keywordProducer.publishRawKeywordInputEvent(keyword);
+        SearchResponse response = searchService.searchByElasticsearch(keyword, pageable, postType);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/top-keywords")
