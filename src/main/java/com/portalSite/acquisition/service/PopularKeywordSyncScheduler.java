@@ -3,6 +3,7 @@ package com.portalSite.acquisition.service;
 import com.portalSite.acquisition.dto.kafkaDto.AutocompleteSuggestionResponse;
 import com.portalSite.acquisition.dto.kafkaDto.KeywordScore;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsMetadata;
 import org.springframework.beans.factory.InitializingBean;
