@@ -60,6 +60,4 @@ Github, Slack, Notion
 <br/>
 
 ## 🔑️기술적 이슈 및 해결 과정
-* [검색 응답 시간 목표 설정](https://sour-furniture-040.notion.site/1e5589af8800801faf87d67eb476f590?pvs=4)
-* [N+1문제 해결 및 성능개선(1차)](https://sour-furniture-040.notion.site/N-1-1-1e5589af880080b4b8a2cfe36a5c15eb?pvs=4)
 * [ElasticSearch 선택 이유](https://sour-furniture-040.notion.site/1ec589af880080bdae8cc38546d14f6d?pvs=4)
