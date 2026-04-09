@@ -5,6 +5,7 @@ import com.portalSite.common.exception.custom.CustomException;
 import com.portalSite.common.exception.custom.ErrorCode;
 import com.portalSite.kafka.KeywordProducer;
 import com.portalSite.search.dto.response.SearchResponse;
+import com.portalSite.search.dto.response.SliceSearchResponse;
 import com.portalSite.search.dto.response.TopKeywordsResponse;
 import com.portalSite.search.service.SearchService;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +47,7 @@ public class SearchController {
     }
 
     @GetMapping("/v2")
-    public ResponseEntity<SearchResponse> searchV2(
+    public ResponseEntity<SliceSearchResponse> searchV2(
             @RequestParam("keyword")
             @NotBlank(message = "검색어를 입력해주세요")
             @Size(min = 1, message = "검색어는 1글자 이상 입력해주세요") String keyword,
@@ -55,7 +55,7 @@ public class SearchController {
             @PageableDefault(sort = "id", direction = DESC) Pageable pageable
     ) {
         keywordProducer.publishRawKeywordInputEvent(keyword); //kafka로 검색어 publish
-        SearchResponse response = searchService.searchV2(keyword, pageable, postType);
+        SliceSearchResponse response = searchService.searchV2(keyword, pageable, postType);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

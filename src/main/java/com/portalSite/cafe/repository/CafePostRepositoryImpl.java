@@ -7,9 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,27 +89,45 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
     }
 
     @Override
-    public Page<CafePostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
-        String sql = "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
-                "FROM cafe_post cp JOIN cafe_member cm ON cm.id=cp.cafe_member_id " +
+    public Slice<CafePostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
+        String idsSql = "SELECT cp.id " +
+                "FROM cafe_post cp " +
                 "WHERE MATCH(title, description) AGAINST(?1 IN BOOLEAN MODE) " +
                 "LIMIT ?2 OFFSET ?3";
 
         @SuppressWarnings("unchecked")
-        List<Object[]> rows = entityManager
-                .createNativeQuery(sql)
+        List<Long> ids = entityManager
+                .createNativeQuery(idsSql)
                 .setParameter(1, keyword + "*")
-                .setParameter(2, pageable.getPageSize())
+                .setParameter(2, pageable.getPageSize()+1)
                 .setParameter(3, pageable.getOffset())
                 .getResultList();
 
-        List<CafePostResponse> content = rows
-                .stream()
+        boolean hasNext = ids.size() > pageable.getPageSize();
+
+        if(ids.isEmpty()){
+            return new SliceImpl<>(List.of(), pageable, hasNext);
+        }
+
+        List<Long> pageIds = ids.stream().limit(pageable.getPageSize()).toList();
+
+        String contentsSql = "SELECT cp.id, cp.cafe_id, cp.cafe_board_id, cm.nickname, cp.title, cp.description " +
+                "FROM cafe_post cp JOIN cafe_member cm ON cm.id=cp.cafe_member_id " +
+                "WHERE cp.id IN (:ids) " +
+                "ORDER BY cp.id DESC";
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = entityManager
+                .createNativeQuery(contentsSql)
+                .setParameter("ids", pageIds)
+                .getResultList();
+
+        List<CafePostResponse> content = rows.stream()
                 .map(row -> {
                     return new CafePostResponse(
-                            ((Long) ((Object[]) row)[0]),  // id
-                            ((Long) ((Object[]) row)[1]),  // cafe_id
-                            ((Long) ((Object[]) row)[2]),  // cafe_board_id
+                            (Long) ((Object[]) row)[0],  // id
+                            (Long) ((Object[]) row)[1],  // cafe_id
+                            (Long) ((Object[]) row)[2],  // cafe_board_id
                             (String) ((Object[]) row)[3],  // nickname
                             (String) ((Object[]) row)[4],  // title
                             (String) ((Object[]) row)[5]   // description
@@ -119,13 +135,7 @@ public class CafePostRepositoryImpl implements CafePostRepositoryCustom {
                 })
                 .toList();
 
-        String countSql = "SELECT COUNT(*) FROM cafe_post cp WHERE MATCH(cp.title, cp.description) AGAINST (?1 IN BOOLEAN MODE)";
-
-        long total = ((Long) entityManager.createNativeQuery(countSql)
-                .setParameter(1, keyword + "*")
-                .getSingleResult());
-
-        return new PageImpl<>(content, pageable, total);
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     private void appendSearchCondition(

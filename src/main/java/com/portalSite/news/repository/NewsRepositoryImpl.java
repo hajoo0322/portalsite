@@ -7,9 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.sql.Timestamp;
@@ -93,27 +91,45 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
     }
 
     @Override
-    public Page<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
-        String sql = "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
-                "FROM news n JOIN member m ON m.member_id=n.member_id " +
+    public Slice<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
+        String idSql = "SELECT n.news_id " +
+                "FROM news n " +
                 "WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE) " +
                 "LIMIT ?2 OFFSET ?3";
 
         @SuppressWarnings("unchecked")
-        List<Object[]> rows = entityManager
-                .createNativeQuery(sql)
+        List<Long> ids = entityManager
+                .createNativeQuery(idSql)
                 .setParameter(1, keyword + "*")
-                .setParameter(2, pageable.getPageSize())
+                .setParameter(2, pageable.getPageSize() + 1) // 다음 페이지 존재 확인을 위해 pageSize+1하여 조회
                 .setParameter(3, pageable.getOffset())
                 .getResultList();
 
-        List<NewsResponse> content = rows
-                .stream()
+        boolean hasNext = ids.size() > pageable.getPageSize();
+
+        if (ids.isEmpty()) {
+            return new SliceImpl<>(List.of(), pageable, hasNext);
+        }
+
+        List<Long> pageIds = ids.stream().limit(pageable.getPageSize()).toList();
+
+        String contentSql = "SELECT n.news_id, m.name, n.news_category_id, n.news_title, n.description, n.created_at " +
+                "FROM news n JOIN member m ON m.member_id=n.member_id " +
+                "WHERE n.news_id IN (:ids) " +
+                "ORDER BY n.news_id DESC ";
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> rows = entityManager
+                .createNativeQuery(contentSql)
+                .setParameter("ids", pageIds)
+                .getResultList();
+
+        List<NewsResponse> content = rows.stream()
                 .map(row -> {
                     return new NewsResponse(
-                            ((Long) ((Object[]) row)[0]),          // id
+                            (Long) ((Object[]) row)[0],          // id
                             (String) ((Object[]) row)[1],          // name
-                            ((Long) ((Object[]) row)[2]),          // news_category_id
+                            (Long) ((Object[]) row)[2],          // news_category_id
                             (String) ((Object[]) row)[3],          // title
                             (String) ((Object[]) row)[4],          // description
                             ((Timestamp) ((Object[]) row)[5]).toLocalDateTime()  // created_at
@@ -121,13 +137,7 @@ public class NewsRepositoryImpl implements NewsRepositoryCustom {
                 })
                 .toList();
 
-        String countSql = "SELECT COUNT(*) FROM news n WHERE MATCH(n.news_title, n.description) AGAINST (?1 IN BOOLEAN MODE)";
-
-        long total = ((Long) entityManager.createNativeQuery(countSql)
-                .setParameter(1, keyword + "*")
-                .getSingleResult());
-
-        return new PageImpl<>(content, pageable, total);
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     private void appendSearchCondition(

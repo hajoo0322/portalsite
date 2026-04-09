@@ -14,12 +14,12 @@ import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.repository.NewsRepository;
 
 import com.portalSite.search.dto.response.SearchResponse;
+import com.portalSite.search.dto.response.SliceSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.io.IOException;
 import java.util.List;
 
@@ -91,18 +91,18 @@ public class SearchService {
         return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
     }
 
-    public SearchResponse searchV2(String keyword, Pageable pageable, PostType postType) {
+    public SliceSearchResponse searchV2(String keyword, Pageable pageable, PostType postType) {
 
-        List<BlogPostResponse> blogPostList = postType == null || postType == PostType.BLOG ?
-                blogPostRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+        Slice<BlogPostResponse> blogPostSlice = postType == null || postType == PostType.BLOG ?
+                blogPostRepository.findAllByKeywordWithIndex(keyword, pageable) : null;
 
-        List<CafePostResponse> cafePostList = postType == null || postType == PostType.CAFE ?
-                cafePostRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+        Slice<CafePostResponse> cafePostSlice = postType == null || postType == PostType.CAFE ?
+                cafePostRepository.findAllByKeywordWithIndex(keyword, pageable) : null;
 
-        List<NewsResponse> newsList = postType == null || postType == PostType.NEWS ?
-                newsRepository.findAllByKeywordWithIndex(keyword, pageable).stream().toList() : null;
+        Slice<NewsResponse> newsSlice = postType == null || postType == PostType.NEWS ?
+                newsRepository.findAllByKeywordWithIndex(keyword, pageable) : null;
 
-        return SearchResponse.from(blogPostList, cafePostList, newsList, pageable);
+        return SliceSearchResponse.from(blogPostSlice, cafePostSlice, newsSlice, pageable);
     }
 
     public SearchResponse searchByElasticsearch(String keyword, Pageable pageable, PostType postType) {

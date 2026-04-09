@@ -4,6 +4,7 @@ import com.portalSite.news.dto.response.NewsResponse;
 import com.portalSite.news.entity.News;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 
@@ -14,5 +15,5 @@ public interface NewsRepositoryCustom {
     Page<NewsResponse> findAllByKeywordV2(
             String keyword, String writer, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, Pageable pageable);
 
-    Page<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
+    Slice<NewsResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable);
 }

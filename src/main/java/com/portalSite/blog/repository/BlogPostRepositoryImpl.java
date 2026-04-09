@@ -7,9 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -89,7 +87,7 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
     }
 
     @Override
-    public Page<BlogPostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
+    public Slice<BlogPostResponse> findAllByKeywordWithIndex(String keyword, Pageable pageable) {
         String sql = "SELECT bp.id, bp.member_id, bp.blog_board_id, bp.title, bp.description " +
                 "FROM blog_post bp " +
                 "WHERE MATCH(bp.title, bp.description) AGAINST (?1 IN BOOLEAN MODE) " +
@@ -99,12 +97,15 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
         List<Object[]> rows = entityManager
                 .createNativeQuery(sql)
                 .setParameter(1, keyword + "*")
-                .setParameter(2, pageable.getPageSize())
+                .setParameter(2, pageable.getPageSize()+1)
                 .setParameter(3, pageable.getOffset())
                 .getResultList();
 
+        boolean hasNext = rows.size() > pageable.getPageSize();
+
         List<BlogPostResponse> content = rows
                 .stream()
+                .limit(pageable.getPageSize())
                 .map(row -> {
                     return new BlogPostResponse(
                             ((Long) ((Object[]) row)[0]),  // id
@@ -116,13 +117,7 @@ public class BlogPostRepositoryImpl implements BlogPostRepositoryCustom {
                 })
                 .toList();
 
-        String countSql = "SELECT COUNT(*) FROM blog_post bp WHERE MATCH(bp.title, bp.description) AGAINST (?1 IN BOOLEAN MODE)";
-
-        long total = ((Long) entityManager.createNativeQuery(countSql)
-                .setParameter(1, keyword + "*")
-                .getSingleResult());
-
-        return new PageImpl<>(content, pageable, total);
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     private void appendSearchCondition(
