@@ -7,10 +7,16 @@ public record CafeMemberResponse(
         Long cafeId,
         String cafeGrade,
         int visitCount,
-        String nickname
-
+        String nickname,
+        boolean isDeleted
 ) {
     public static CafeMemberResponse from(CafeMember cafeMember) {
-        return new CafeMemberResponse(cafeMember.getId(),cafeMember.getCafe().getId(),cafeMember.getCafeLevel().getGrade(),cafeMember.getVisitCount(),cafeMember.getNickname());
+        return new CafeMemberResponse(
+                cafeMember.getId(),
+                cafeMember.getCafe().getId(),
+                cafeMember.getCafeLevel().getGrade(),
+                cafeMember.getVisitCount(),
+                cafeMember.getNickname(),
+                cafeMember.isDeleted());
     }
 }

@@ -53,7 +53,7 @@ public class CafeMemberService {
 
     @Transactional(readOnly = true)
     public List<CafeMemberResponse> getAllCafeMember(Long cafeId) {
-        return cafeMemberRepository.findAllByCafeId(cafeId).stream().map(CafeMemberResponse::from).toList();
+        return cafeMemberRepository.findAllByCafeIdIsDeletedFalse(cafeId).stream().map(CafeMemberResponse::from).toList();
     }
 
     @Transactional
