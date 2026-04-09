@@ -46,8 +46,8 @@ Github, Slack, Notion
 ## 🗺️ ERD
 
 -------------
-작성 ERD는 아래 링크에서 확인 가능합니다.
-<br/>👉🏻 [ERD 바로 가기](https://www.erdcloud.com/d/gPhB7S246SCxLTKf3)
+
+![ERD](ERD.png)
 <br/>
 <br/>
 
@@ -55,9 +55,7 @@ Github, Slack, Notion
 
 -------------
 작성한 API는 아래 링크에서 확인 가능합니다.
-<br/>👉🏻 [API 바로 가기](https://documenter.getpostman.com/view/40135309/2sB2qZFNba)
+<br/> [API 바로 가기](https://documenter.getpostman.com/view/40135309/2sB2qZFNba)
 <br/>
 <br/>
 
-## 🔑️기술적 이슈 및 해결 과정
-* [ElasticSearch 선택 이유](https://sour-furniture-040.notion.site/1ec589af880080bdae8cc38546d14f6d?pvs=4)
