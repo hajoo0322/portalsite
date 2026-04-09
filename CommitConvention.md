@@ -12,4 +12,4 @@
 ♻️Refactoring : 코드 리팩토링 <br>
 👽ExternalAPI : 외부 API 변화로 인한 수정 <br>
 🗃️Database : 데이터베이스 관련 수정 <br>
-🙈GitIgnore : gitignore 추가/수정
+🙈GitIgnore : gitignore 추가/수정 <br>
