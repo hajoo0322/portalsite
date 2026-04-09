@@ -4,7 +4,9 @@ import com.portalSite.cafe.dto.CafeResponse;
 import com.portalSite.cafe.dto.CafeRequest;
 import com.portalSite.cafe.entity.Cafe;
 import com.portalSite.cafe.entity.CafeLevel;
+import com.portalSite.cafe.entity.CafeMember;
 import com.portalSite.cafe.repository.CafeLevelRepository;
+import com.portalSite.cafe.repository.CafeMemberRepository;
 import com.portalSite.cafe.repository.CafeRepository;
 import com.portalSite.common.exception.core.DuplicateNameException;
 import com.portalSite.common.exception.core.NotFoundException;
@@ -21,6 +23,7 @@ public class CafeService{
 
     private final CafeRepository cafeRepository;
     private final CafeLevelRepository cafeLevelRepository;
+    private final CafeMemberRepository cafeMemberRepository;
 
     @Transactional
     public CafeResponse addCafe(CafeRequest requestCafe) {
@@ -50,8 +53,10 @@ public class CafeService{
     public void deleteCafe(Long cafeId) {
         Cafe cafe = cafeRepository.findById(cafeId).orElseThrow(() -> new NotFoundException(ErrorCode.CAFE_NOT_FOUND));
         List<CafeLevel> cafeLevelList = cafeLevelRepository.findAllByCafeId(cafeId);
-        cafeRepository.delete(cafe);
+        List<CafeMember> cafeMemberList = cafeMemberRepository.findAllByCafeId(cafeId);
+        cafeMemberRepository.deleteAll(cafeMemberList);
         cafeLevelRepository.deleteAll(cafeLevelList);
+        cafeRepository.delete(cafe);
     }
 
     @Transactional(readOnly = true)
