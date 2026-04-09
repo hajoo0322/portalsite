@@ -18,12 +18,12 @@ public class PublishLogService {
     private final JsonHelper jsonHelper;
 
     private static final String POPULAR_SEARCH_EVENTS = "popular-search-events";
-    private static final String AUTOCOMPLETE_EVENTS = "Autocomplete-events";
+    private static final String AUTOCOMPLETE_EVENTS = "autocomplete-events";
 
     public void sendSearchClickEvent(SearchClickRequest searchClickRequest, String clientIp) {
         PopularSearchEvent popularSearchEvent = PopularSearchEvent.of(searchClickRequest, clientIp);
-            String payload = jsonHelper.toJson(popularSearchEvent);
-            kafkaTemplate.send(POPULAR_SEARCH_EVENTS, searchClickRequest.keyword(), payload);
+        String payload = jsonHelper.toJson(popularSearchEvent);
+        kafkaTemplate.send(POPULAR_SEARCH_EVENTS, searchClickRequest.keyword(), payload);
     }
 
     public void sendAutocompleteClickEvent(AutocompleteClickRequest autocompleteClickRequest, String clientIp) {

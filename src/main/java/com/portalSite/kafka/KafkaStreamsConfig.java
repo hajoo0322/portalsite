@@ -24,12 +24,18 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class KafkaStreamsConfig {
 
+    private static final String AUTOCOMPLETE_EVENTS = "autocomplete-events";
+    private static final String POPULAR_SEARCH_EVENTS = "popular-search-events";
+    private static final String DEBUG_OUTPUT_TOPIC = "debug-output-topic";
+    private static final String AUTOCOMPLETE_DEBUG_TOPIC = "autocomplete-debug-topic";
+    private static final String AUTOCOMPLETE_SCORE_STORE = "autocomplete-score-store";
+    private static final String KEYWORD_SCORE_STORE = "keyword-score-store";
     private final JsonHelper jsonHelper;
 
     @Bean
     public KStream<String, String> popularKeywordsStream(StreamsBuilder streamsBuilder) {
         KStream<String, String> stream = streamsBuilder.stream(
-                "popular-search-events",
+                POPULAR_SEARCH_EVENTS,
                 Consumed.with(
                         Serdes.String(),
                         Serdes.String()
@@ -46,20 +52,20 @@ public class KafkaStreamsConfig {
                 .aggregate(
                         () -> 0.0,
                         (keyword, event, score) -> score + calculatePopularSearchScore(event),
-                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as("keyword-score-store") //내가 뭘시발건드렸을까
+                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as(KEYWORD_SCORE_STORE)
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(Serdes.Double())
                 )
                 .toStream()
                 .peek((key, value) -> System.out.println("[DEBUG] Aggregated: " + key + " -> " + value))
-                .to("debug-output-topic", Produced.with(Serdes.String(), Serdes.Double()));
+                .to(DEBUG_OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.Double()));
 
         return stream;
     }
 
     @Bean
     public KStream<String, String> autocompleteStream(StreamsBuilder streamsBuilder) {
-        KStream<String, String> stream = streamsBuilder.stream("Autocomplete-events", Consumed.with(Serdes.String(), Serdes.String()));
+        KStream<String, String> stream = streamsBuilder.stream(AUTOCOMPLETE_EVENTS, Consumed.with(Serdes.String(), Serdes.String()));
         KStream<String, AutocompleteEvent> events = stream.mapValues(
                 json -> jsonHelper.fromJson(json, AutocompleteEvent.class)
         );
@@ -81,13 +87,13 @@ public class KafkaStreamsConfig {
                 .aggregate(
                         () -> 0.0,
                         (compositeKey, event, score) -> score + calculateAutocompleteScore(event),
-                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as("autocomplete-score-store")
+                        Materialized.<String, Double, KeyValueStore<Bytes, byte[]>>as(AUTOCOMPLETE_SCORE_STORE)
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(Serdes.Double())
                 )
                 .toStream()
                 .peek((key, value) -> System.out.println("[AUTOCOMPLETE DEBUG] " + key + " -> " + value))
-                .to("autocomplete-debug-topic", Produced.with(Serdes.String(), Serdes.Double()));
+                .to(AUTOCOMPLETE_DEBUG_TOPIC, Produced.with(Serdes.String(), Serdes.Double()));
         return stream;
     }
 

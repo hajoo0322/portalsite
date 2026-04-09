@@ -20,9 +20,9 @@ public class SearchRankingService {
 
     private static final String RANKING_KEY_PREFIX = "search_rank:";
     private static final String TOPIC = "search-log";
+    private static final String GROUP_ID = "search-log-group";
 
     private static final int RANKTIME = 5;
-
 
     public void sendSearchLog(String keyword) {
         kafkaTemplate.send(TOPIC, keyword);
@@ -56,7 +56,7 @@ public class SearchRankingService {
         return result;
     }
 
-    @KafkaListener(topics = "search-log", groupId = "search-log-group")
+    @KafkaListener(topics = TOPIC, groupId = GROUP_ID)
     public void consume(String keyword) {
 
         String key = getMinuteKey(LocalDateTime.now());
